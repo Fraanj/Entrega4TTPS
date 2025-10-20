@@ -7,7 +7,7 @@ import jakarta.persistence.*;
  * reemplazando al Enum.
  */
 @Entity
-@Table(name = "cat_tamanios_mascota")
+@Table(name = "tamanios_mascota")
 public class TamanioMascota {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

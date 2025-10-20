@@ -3,7 +3,7 @@ package ttps.proyecto.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "cat_roles")
+@Table(name = "roles")
 public class Rol {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

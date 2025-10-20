@@ -3,7 +3,7 @@ package ttps.proyecto.models;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "cat_estados_usuario")
+@Table(name = "estados_usuario")
 public class EstadoUsuario {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
