@@ -1,4 +1,4 @@
-package fraanj.proyecto;
+package ttps.proyecto;
 
 import java.io.*;
 
