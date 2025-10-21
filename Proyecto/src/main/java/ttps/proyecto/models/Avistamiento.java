@@ -35,5 +35,15 @@ public class Avistamiento {
     // Constructor vacío
     public Avistamiento() {}
 
-    // Getters y Setters...
+    public Long getId() { return id; }
+    public LocalDate getFecha() { return fecha; }
+    public void setFecha(LocalDate fecha) { this.fecha = fecha; }
+    public String getComentario() { return comentario; }
+    public void setComentario(String comentario) { this.comentario = comentario; }
+    public Usuario getReportador() { return reportador; }
+    public void setReportador(Usuario reportador) { this.reportador = reportador; }
+    public Mascota getMascota() { return mascota; }
+    public void setMascota(Mascota mascota) { this.mascota = mascota; }
+    public Ubicacion getUbicacion() { return ubicacion; }
+    public void setUbicacion(Ubicacion ubicacion) {this.ubicacion = ubicacion; }
 }

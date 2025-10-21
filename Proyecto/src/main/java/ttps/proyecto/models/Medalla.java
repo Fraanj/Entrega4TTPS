@@ -26,4 +26,12 @@ public class Medalla {
 
     // Constructor vacío, Getters y Setters...
     public Medalla() {}
+
+    public Long getId(){return this.id;}
+    public String getNombre(){return this.nombre;}
+    public void setNombre(String nombre){this.nombre = nombre;}
+    public String getDescripcion(){return this.descripcion;}
+    public void setDescripcion(String descripcion){this.descripcion = descripcion;}
+    public Set<Usuario> getUsuarios() {return this.usuarios;}
+    public void setUsuarios(Set<Usuario> usuarios) {this.usuarios = usuarios;}
 }
