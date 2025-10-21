@@ -13,7 +13,9 @@ public class EstadoUsuario {
     private String nombre; // "HABILITADO", "DESHABILITADO"
 
     public EstadoUsuario() {}
-    // Getters y Setters...
+    public Long getId() {
+        return id;
+    }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 }

@@ -17,7 +17,9 @@ public class TamanioMascota {
     private String nombre; // "PEQUENIO", "MEDIANO", "GRANDE"
 
     public TamanioMascota() {}
-    // Getters y Setters...
+    public Long getId() {
+        return id;
+    }
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) { this.nombre = nombre; }
 }
