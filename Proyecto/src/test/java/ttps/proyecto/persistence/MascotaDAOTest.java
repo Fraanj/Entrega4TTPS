@@ -6,18 +6,19 @@ import ttps.proyecto.models.Ubicacion;
 import ttps.proyecto.models.EstadoUsuario;
 import ttps.proyecto.models.Rol;
 import ttps.proyecto.models.TamanioMascota;
-import ttps.proyecto.models.enums.EstadoMascota; // El Enum
+import ttps.proyecto.models.enums.EstadoMascota;
 import ttps.proyecto.persistence.dao.*;
 import ttps.proyecto.persistence.util.FactoryDAO;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Prueba C.R.U.D.
- * Usamos @BeforeAll y @AfterAll para crear los datos de catálogo
- * una sola vez para todas las pruebas.
+ * Pruebas CRUD y búsquedas para Mascota.
  */
 public class MascotaDAOTest {
 
@@ -36,15 +37,11 @@ public class MascotaDAOTest {
 
     @BeforeAll
     public static void setUpAll() {
-        // Cargar DAOs
         mascotaDAO = FactoryDAO.getMascotaDAO();
         usuarioDAO = FactoryDAO.getUsuarioDAO();
         rolDAO = FactoryDAO.getRolDAO();
         estadoUsuarioDAO = FactoryDAO.getEstadoUsuarioDAO();
         tamanioDAO = FactoryDAO.getTamanioMascotaDAO();
-
-        // --- 1. Crear datos de Catálogo ---
-        // (En una app real, esto se haría con un script SQL (seeding))
 
         rolUsuario = new Rol();
         rolUsuario.setNombre("USUARIO_TEST");
@@ -61,13 +58,10 @@ public class MascotaDAOTest {
 
     @AfterAll
     public static void tearDownAll() {
-        // Limpiar datos de catálogo
-        // (En una BD con FKs, deberíamos borrar usuarios y mascotas primero)
-        // Por simplicidad del test, si hbm2ddl es "create-drop", esto es opcional.
         try {
-            rolDAO.eliminar(rolUsuario.getId());
-            estadoUsuarioDAO.eliminar(estadoHabilitado.getId());
-            tamanioDAO.eliminar(tamanioMediano.getId());
+            if (rolUsuario != null && rolUsuario.getId() != null) rolDAO.eliminar(rolUsuario.getId());
+            if (estadoHabilitado != null && estadoHabilitado.getId() != null) estadoUsuarioDAO.eliminar(estadoHabilitado.getId());
+            if (tamanioMediano != null && tamanioMediano.getId() != null) tamanioDAO.eliminar(tamanioMediano.getId());
         } catch (Exception e) {
             System.err.println("Error limpiando datos de catálogo: " + e.getMessage());
         }
@@ -79,25 +73,24 @@ public class MascotaDAOTest {
         Long mascotaId = null;
 
         try {
-            // --- 2. ALTA (Usuario) ---
+            // --- ALTA (Usuario) ---
             Usuario usuario = new Usuario();
             usuario.setNombre("Usuario");
             usuario.setApellido("DePrueba");
             usuario.setEmail("test_crud@test.com");
             usuario.setPassword("1234");
-            // Asignamos las entidades de catálogo
             usuario.setRol(rolUsuario);
             usuario.setEstado(estadoHabilitado);
             usuarioDAO.persistir(usuario);
             usuarioId = usuario.getId();
             assertNotNull(usuarioId, "El usuario no se pudo persistir");
 
-            // --- 3. ALTA (Mascota) ---
+            // --- ALTA (Mascota) ---
             Mascota mascota = new Mascota();
             mascota.setNombre("Fido");
-            mascota.setEstado(EstadoMascota.PERDIDO_PROPIO); // Usamos el Enum
-            mascota.setPublicador(usuario); // Asociamos al usuario
-            mascota.setTamanio(tamanioMediano); // Asignamos la entidad de catálogo
+            mascota.setEstado(EstadoMascota.PERDIDO_PROPIO);
+            mascota.setPublicador(usuario);
+            mascota.setTamanio(tamanioMediano);
 
             Ubicacion ubicacion = new Ubicacion();
             ubicacion.setBarrio("La Plata");
@@ -107,16 +100,16 @@ public class MascotaDAOTest {
             mascotaId = mascota.getId();
             assertNotNull(mascotaId, "La mascota no se pudo persistir");
 
-            // --- 4. RECUPERACIÓN (Mascota) ---
+            // --- RECUPERACIÓN ---
             Mascota mascotaRecuperada = mascotaDAO.recuperarPorId(mascotaId);
             assertNotNull(mascotaRecuperada, "La mascota no se pudo recuperar");
             assertEquals("Fido", mascotaRecuperada.getNombre());
             assertEquals("La Plata", mascotaRecuperada.getUltimaUbicacion().getBarrio());
             assertEquals(usuarioId, mascotaRecuperada.getPublicador().getId());
 
-            // --- 5. MODIFICACIÓN (Mascota) ---
+            // --- MODIFICACIÓN ---
             mascotaRecuperada.setNombre("FidoModificado");
-            mascotaRecuperada.setEstado(EstadoMascota.RECUPERADO); // Cambiamos el Enum
+            mascotaRecuperada.setEstado(EstadoMascota.RECUPERADO);
             mascotaDAO.actualizar(mascotaRecuperada);
 
             Mascota mascotaModificada = mascotaDAO.recuperarPorId(mascotaId);
@@ -124,16 +117,72 @@ public class MascotaDAOTest {
             assertEquals(EstadoMascota.RECUPERADO, mascotaModificada.getEstado());
 
         } finally {
-            // --- 6. BAJA (Limpieza) ---
-            // Gracias a CascadeType.ALL, al borrar el usuario se borra su mascota.
+            // --- BAJA ---
             if (usuarioId != null) {
                 usuarioDAO.eliminar(usuarioId);
             }
-
-            // Verificamos que la mascota también se haya borrado (por cascada)
             if (mascotaId != null) {
                 assertNull(mascotaDAO.recuperarPorId(mascotaId), "La mascota no fue borrada en cascada");
             }
+        }
+    }
+
+    @Test
+    public void testBuscarPorEstadoYBarrio() {
+        Long usuarioId = null;
+        Long m1 = null;
+        Long m2 = null;
+
+        try {
+            Usuario usuario = new Usuario();
+            usuario.setNombre("Buscador");
+            usuario.setApellido("Test");
+            usuario.setEmail("buscador@test");
+            usuario.setPassword("pwd");
+            usuario.setRol(rolUsuario);
+            usuario.setEstado(estadoHabilitado);
+            usuarioDAO.persistir(usuario);
+            usuarioId = usuario.getId();
+            assertNotNull(usuarioId);
+
+            Mascota mascota1 = new Mascota();
+            mascota1.setNombre("Perdida1");
+            mascota1.setEstado(EstadoMascota.PERDIDO_PROPIO);
+            mascota1.setPublicador(usuario);
+            mascota1.setTamanio(tamanioMediano);
+            mascota1.setUltimaUbicacion(new Ubicacion());
+            mascota1.getUltimaUbicacion().setBarrio("BarrioX");
+            mascotaDAO.persistir(mascota1);
+            m1 = mascota1.getId();
+
+            Mascota mascota2 = new Mascota();
+            mascota2.setNombre("Encontrada1");
+            mascota2.setEstado(EstadoMascota.RECUPERADO);
+            mascota2.setPublicador(usuario);
+            mascota2.setTamanio(tamanioMediano);
+            mascota2.setUltimaUbicacion(new Ubicacion());
+            mascota2.getUltimaUbicacion().setBarrio("BarrioY");
+            mascotaDAO.persistir(mascota2);
+            m2 = mascota2.getId();
+
+            // buscar por estado
+            List<Mascota> perdidas = mascotaDAO.buscarPorEstado(EstadoMascota.PERDIDO_PROPIO);
+            assertNotNull(perdidas);
+            Long finalM = m1;
+            assertTrue(perdidas.stream().anyMatch(m -> m.getId().equals(finalM)));
+
+            // buscar por barrio
+            List<Mascota> barrioX = mascotaDAO.buscarPorBarrio("BarrioX");
+            assertNotNull(barrioX);
+            Long finalM1 = m1;
+            assertTrue(barrioX.stream().anyMatch(m -> m.getId().equals(finalM1)));
+            Long finalM2 = m2;
+            assertFalse(barrioX.stream().anyMatch(m -> m.getId().equals(finalM2)));
+
+        } finally {
+            if (m1 != null) try { mascotaDAO.eliminar(m1); } catch (Exception ignored) {}
+            if (m2 != null) try { mascotaDAO.eliminar(m2); } catch (Exception ignored) {}
+            if (usuarioId != null) try { usuarioDAO.eliminar(usuarioId); } catch (Exception ignored) {}
         }
     }
 }

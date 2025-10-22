@@ -13,6 +13,9 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+/**
+ * Test CRUD básico para Usuario usando DAO.
+ */
 public class UsuarioDAOTest {
 
     private static UsuarioDAO usuarioDAO;
@@ -41,18 +44,9 @@ public class UsuarioDAOTest {
     public static void tearDownAll() {
         try {
             if (rolUsuario != null && rolUsuario.getId() != null) rolDAO.eliminar(rolUsuario.getId());
-            if (estadoHabilitado != null && estadoHabilitado.getId() != null) stateSafeDelete();
+            if (estadoHabilitado != null && estadoHabilitado.getId() != null) estadoDAO.eliminar(estadoHabilitado.getId());
         } catch (Exception e) {
             System.err.println("Error limpiando catálogo Usuario: " + e.getMessage());
-        }
-    }
-
-    private static void stateSafeDelete() {
-        // envuelve en try/catch por si el delete falla por FK
-        try {
-            estadoDAO.eliminar(estadoHabilitado.getId());
-        } catch (Exception e) {
-            System.err.println("No se pudo borrar estado: " + e.getMessage());
         }
     }
 

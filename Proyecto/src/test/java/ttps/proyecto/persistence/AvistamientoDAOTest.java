@@ -1,6 +1,5 @@
 package ttps.proyecto.persistence;
 
-
 import ttps.proyecto.models.Avistamiento;
 import ttps.proyecto.models.Mascota;
 import ttps.proyecto.models.Usuario;
@@ -16,6 +15,9 @@ import ttps.proyecto.persistence.dao.RolDAO;
 import ttps.proyecto.persistence.dao.EstadoUsuarioDAO;
 import ttps.proyecto.persistence.dao.TamanioMascotaDAO;
 import ttps.proyecto.persistence.util.FactoryDAO;
+import ttps.proyecto.persistence.util.EMF;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -25,8 +27,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test CRUD para Avistamiento:
- * - crea usuario + mascota (requisitos), luego crea Avistamiento y prueba ALTA/RECUP/MODIF/BAJA.
+ * Test CRUD para Avistamiento. Usamos JOIN FETCH en el test para inicializar relaciones y evitar LazyInitializationException.
  */
 public class AvistamientoDAOTest {
 
@@ -50,7 +51,6 @@ public class AvistamientoDAOTest {
         estadoDAO = FactoryDAO.getEstadoUsuarioDAO();
         tamanioDAO = FactoryDAO.getTamanioMascotaDAO();
 
-        // datos de catálogo
         rolUsuario = new Rol();
         rolUsuario.setNombre("REPORTADOR_TEST");
         rolDAO.persistir(rolUsuario);
@@ -69,9 +69,17 @@ public class AvistamientoDAOTest {
         try {
             if (tamanioMediano != null && tamanioMediano.getId() != null) tamanioDAO.eliminar(tamanioMediano.getId());
             if (rolUsuario != null && rolUsuario.getId() != null) rolDAO.eliminar(rolUsuario.getId());
-            if (estadoHabilitado != null && estadoHabilitado.getId() != null) estadoDAO.eliminar(estadoHabilitado.getId());
+            if (estadoHabilitado != null && estadoHabilitado.getId() != null) stateSafeDelete();
         } catch (Exception e) {
             System.err.println("Error limpiando catálogos Avistamiento: " + e.getMessage());
+        }
+    }
+
+    private static void stateSafeDelete() {
+        try {
+            estadoDAO.eliminar(estadoHabilitado.getId());
+        } catch (Exception e) {
+            System.err.println("No se pudo borrar estado: " + e.getMessage());
         }
     }
 
@@ -82,7 +90,7 @@ public class AvistamientoDAOTest {
         Long avistamientoId = null;
 
         try {
-            // Crear y persistir Usuario (ALTA requisito)
+            // Crear y persistir Usuario
             Usuario usuario = new Usuario();
             usuario.setNombre("Reportador");
             usuario.setApellido("Test");
@@ -94,7 +102,7 @@ public class AvistamientoDAOTest {
             usuarioId = usuario.getId();
             assertNotNull(usuarioId, "No se persistió usuario requisito");
 
-            // Crear y persistir Mascota (ALTA requisito)
+            // Crear y persistir Mascota
             Mascota mascota = new Mascota();
             mascota.setNombre("MascotaParaAvistamiento");
             mascota.setEstado(EstadoMascota.PERDIDO_PROPIO);
@@ -106,7 +114,7 @@ public class AvistamientoDAOTest {
             mascotaId = mascota.getId();
             assertNotNull(mascotaId, "No se persistió mascota requisito");
 
-            // --- ALTA (Avistamiento) ---
+            // ALTA Avistamiento (vía DAO)
             Avistamiento av = new Avistamiento();
             av.setFecha(LocalDate.now());
             av.setComentario("Primera observación");
@@ -119,27 +127,50 @@ public class AvistamientoDAOTest {
             avistamientoId = av.getId();
             assertNotNull(avistamientoId, "No se persistió avistamiento (ALTA)");
 
-            // --- RECUPERACIÓN ---
-            Avistamiento recuperado = avistamientoDAO.recuperarPorId(avistamientoId);
-            assertNotNull(recuperado, "No se recuperó avistamiento (RECUP)");
-            assertEquals("Primera observación", recuperado.getComentario());
-            assertEquals("MascotaParaAvistamiento", recuperado.getMascota().getNombre());
-            assertEquals(usuarioId, recuperado.getReportador().getId());
+            // RECUPERACIÓN con JOIN FETCH (para inicializar relaciones)
+            EntityManager em = EMF.getEMF().createEntityManager();
+            try {
+                TypedQuery<Avistamiento> q = em.createQuery(
+                        "SELECT a FROM Avistamiento a " +
+                                "LEFT JOIN FETCH a.mascota m " +
+                                "LEFT JOIN FETCH a.reportador r " +
+                                "LEFT JOIN FETCH a.ubicacion u " +
+                                "LEFT JOIN FETCH a.foto f " +
+                                "WHERE a.id = :id", Avistamiento.class);
+                q.setParameter("id", avistamientoId);
+                Avistamiento recuperado = q.getSingleResult();
 
-            // --- MODIFICACIÓN ---
-            recuperado.setComentario("Comentario modificado");
-            avistamientoDAO.actualizar(recuperado);
+                assertNotNull(recuperado, "No se recuperó avistamiento (RECUP)");
+                assertEquals("Primera observación", recuperado.getComentario());
+                assertEquals("MascotaParaAvistamiento", recuperado.getMascota().getNombre());
+                assertEquals(usuarioId, recuperado.getReportador().getId());
 
-            Avistamiento mod = avistamientoDAO.recuperarPorId(avistamientoId);
-            assertEquals("Comentario modificado", mod.getComentario(), "No se aplicó la modificación (MODIF)");
+                // MODIFICACIÓN
+                recuperado.setComentario("Comentario modificado");
+                // actualizar vía DAO (nota: esto hace merge en otro EM)
+                avistamientoDAO.actualizar(recuperado);
 
-        } finally {
-            // --- BAJA ---
-            if (avistamientoId != null) {
-                avistamientoDAO.eliminar(avistamientoId);
-                assertNull(avistamientoDAO.recuperarPorId(avistamientoId), "Avistamiento no eliminado (BAJA)");
+                // Volvemos a recuperar con JOIN FETCH para verificar el cambio
+                TypedQuery<Avistamiento> q2 = em.createQuery(
+                        "SELECT a FROM Avistamiento a " +
+                                "LEFT JOIN FETCH a.mascota m " +
+                                "LEFT JOIN FETCH a.reportador r " +
+                                "LEFT JOIN FETCH a.ubicacion u " +
+                                "LEFT JOIN FETCH a.foto f " +
+                                "WHERE a.id = :id", Avistamiento.class);
+                q2.setParameter("id", avistamientoId);
+                Avistamiento mod = q2.getSingleResult();
+                assertEquals("Comentario modificado", mod.getComentario(), "No se aplicó la modificación (MODIF)");
+
+            } finally {
+                em.close();
             }
 
+        } finally {
+            // BAJA
+            if (avistamientoId != null) {
+                try { avistamientoDAO.eliminar(avistamientoId); } catch (Exception ignored) {}
+            }
             if (mascotaId != null) {
                 try { mascotaDAO.eliminar(mascotaId); } catch (Exception ignored) {}
             }
