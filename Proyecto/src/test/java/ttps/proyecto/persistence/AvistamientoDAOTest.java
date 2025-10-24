@@ -15,9 +15,6 @@ import ttps.proyecto.persistence.dao.RolDAO;
 import ttps.proyecto.persistence.dao.EstadoUsuarioDAO;
 import ttps.proyecto.persistence.dao.TamanioMascotaDAO;
 import ttps.proyecto.persistence.util.FactoryDAO;
-import ttps.proyecto.persistence.util.EMF;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.TypedQuery;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
@@ -27,7 +24,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * Test CRUD para Avistamiento. Usamos JOIN FETCH en el test para inicializar relaciones y evitar LazyInitializationException.
+ * Unary tests for Avistamiento CRUD operations.
  */
 public class AvistamientoDAOTest {
 
@@ -69,114 +66,236 @@ public class AvistamientoDAOTest {
         try {
             if (tamanioMediano != null && tamanioMediano.getId() != null) tamanioDAO.eliminar(tamanioMediano.getId());
             if (rolUsuario != null && rolUsuario.getId() != null) rolDAO.eliminar(rolUsuario.getId());
-            if (estadoHabilitado != null && estadoHabilitado.getId() != null) stateSafeDelete();
+            if (estadoHabilitado != null && estadoHabilitado.getId() != null) safeDeleteEstado();
         } catch (Exception e) {
-            System.err.println("Error limpiando catálogos Avistamiento: " + e.getMessage());
+            System.err.println("Error cleaning catalogs: " + e.getMessage());
         }
     }
 
-    private static void stateSafeDelete() {
+    private static void safeDeleteEstado() {
         try {
             estadoDAO.eliminar(estadoHabilitado.getId());
         } catch (Exception e) {
-            System.err.println("No se pudo borrar estado: " + e.getMessage());
+            System.err.println("Could not delete estado: " + e.getMessage());
         }
     }
 
     @Test
-    public void testCRUDAvistamiento() {
+    public void testCreateAvistamiento() {
         Long usuarioId = null;
         Long mascotaId = null;
         Long avistamientoId = null;
 
         try {
-            // Crear y persistir Usuario
             Usuario usuario = new Usuario();
-            usuario.setNombre("Reportador");
+            usuario.setNombre("Creator");
             usuario.setApellido("Test");
-            usuario.setEmail("reportador@test");
+            usuario.setEmail("creator@test");
             usuario.setPassword("pwd");
             usuario.setRol(rolUsuario);
             usuario.setEstado(estadoHabilitado);
             usuarioDAO.persistir(usuario);
             usuarioId = usuario.getId();
-            assertNotNull(usuarioId, "No se persistió usuario requisito");
+            assertNotNull(usuarioId);
 
-            // Crear y persistir Mascota
             Mascota mascota = new Mascota();
-            mascota.setNombre("MascotaParaAvistamiento");
+            mascota.setNombre("MascotaCreate");
             mascota.setEstado(EstadoMascota.PERDIDO_PROPIO);
             mascota.setPublicador(usuario);
             mascota.setTamanio(tamanioMediano);
             mascota.setUltimaUbicacion(new Ubicacion());
-            mascota.getUltimaUbicacion().setBarrio("BarrioTest");
+            mascota.getUltimaUbicacion().setBarrio("BarrioCreate");
             mascotaDAO.persistir(mascota);
             mascotaId = mascota.getId();
-            assertNotNull(mascotaId, "No se persistió mascota requisito");
+            assertNotNull(mascotaId);
 
-            // ALTA Avistamiento (vía DAO)
             Avistamiento av = new Avistamiento();
             av.setFecha(LocalDate.now());
-            av.setComentario("Primera observación");
+            av.setComentario("Create observation");
             av.setReportador(usuario);
             av.setMascota(mascota);
             Ubicacion ub = new Ubicacion();
-            ub.setBarrio("BarrioAvistamiento");
+            ub.setBarrio("BarrioAvCreate");
             av.setUbicacion(ub);
             avistamientoDAO.persistir(av);
             avistamientoId = av.getId();
-            assertNotNull(avistamientoId, "No se persistió avistamiento (ALTA)");
+            assertNotNull(avistamientoId);
 
-            // RECUPERACIÓN con JOIN FETCH (para inicializar relaciones)
-            EntityManager em = EMF.getEMF().createEntityManager();
-            try {
-                TypedQuery<Avistamiento> q = em.createQuery(
-                        "SELECT a FROM Avistamiento a " +
-                                "LEFT JOIN FETCH a.mascota m " +
-                                "LEFT JOIN FETCH a.reportador r " +
-                                "LEFT JOIN FETCH a.ubicacion u " +
-                                "LEFT JOIN FETCH a.foto f " +
-                                "WHERE a.id = :id", Avistamiento.class);
-                q.setParameter("id", avistamientoId);
-                Avistamiento recuperado = q.getSingleResult();
-
-                assertNotNull(recuperado, "No se recuperó avistamiento (RECUP)");
-                assertEquals("Primera observación", recuperado.getComentario());
-                assertEquals("MascotaParaAvistamiento", recuperado.getMascota().getNombre());
-                assertEquals(usuarioId, recuperado.getReportador().getId());
-
-                // MODIFICACIÓN
-                recuperado.setComentario("Comentario modificado");
-                // actualizar vía DAO (nota: esto hace merge en otro EM)
-                avistamientoDAO.actualizar(recuperado);
-
-                // Volvemos a recuperar con JOIN FETCH para verificar el cambio
-                TypedQuery<Avistamiento> q2 = em.createQuery(
-                        "SELECT a FROM Avistamiento a " +
-                                "LEFT JOIN FETCH a.mascota m " +
-                                "LEFT JOIN FETCH a.reportador r " +
-                                "LEFT JOIN FETCH a.ubicacion u " +
-                                "LEFT JOIN FETCH a.foto f " +
-                                "WHERE a.id = :id", Avistamiento.class);
-                q2.setParameter("id", avistamientoId);
-                Avistamiento mod = q2.getSingleResult();
-                assertEquals("Comentario modificado", mod.getComentario(), "No se aplicó la modificación (MODIF)");
-
-            } finally {
-                em.close();
-            }
-
+            Avistamiento rec = avistamientoDAO.recuperarPorIdConRelaciones(avistamientoId);
+            assertNotNull(rec);
+            assertEquals("Create observation", rec.getComentario());
+            assertEquals("MascotaCreate", rec.getMascota().getNombre());
+            assertEquals(usuarioId, rec.getReportador().getId());
         } finally {
-            // BAJA
-            if (avistamientoId != null) {
-                try { avistamientoDAO.eliminar(avistamientoId); } catch (Exception ignored) {}
+            if (avistamientoId != null) try { avistamientoDAO.eliminar(avistamientoId); } catch (Exception ignored) {}
+            if (mascotaId != null) try { mascotaDAO.eliminar(mascotaId); } catch (Exception ignored) {}
+            if (usuarioId != null) try { usuarioDAO.eliminar(usuarioId); } catch (Exception ignored) {}
+        }
+    }
+
+    @Test
+    public void testReadAvistamiento() {
+        Long usuarioId = null;
+        Long mascotaId = null;
+        Long avistamientoId = null;
+
+        try {
+            Usuario usuario = new Usuario();
+            usuario.setNombre("Reader");
+            usuario.setApellido("Test");
+            usuario.setEmail("reader@test");
+            usuario.setPassword("pwd");
+            usuario.setRol(rolUsuario);
+            usuario.setEstado(estadoHabilitado);
+            usuarioDAO.persistir(usuario);
+            usuarioId = usuario.getId();
+            assertNotNull(usuarioId);
+
+            Mascota mascota = new Mascota();
+            mascota.setNombre("MascotaRead");
+            mascota.setEstado(EstadoMascota.PERDIDO_PROPIO);
+            mascota.setPublicador(usuario);
+            mascota.setTamanio(tamanioMediano);
+            mascota.setUltimaUbicacion(new Ubicacion());
+            mascota.getUltimaUbicacion().setBarrio("BarrioRead");
+            mascotaDAO.persistir(mascota);
+            mascotaId = mascota.getId();
+            assertNotNull(mascotaId);
+
+            Avistamiento av = new Avistamiento();
+            av.setFecha(LocalDate.now());
+            av.setComentario("Read observation");
+            av.setReportador(usuario);
+            av.setMascota(mascota);
+            Ubicacion ub = new Ubicacion();
+            ub.setBarrio("BarrioAvRead");
+            av.setUbicacion(ub);
+            avistamientoDAO.persistir(av);
+            avistamientoId = av.getId();
+            assertNotNull(avistamientoId);
+
+            Avistamiento rec = avistamientoDAO.recuperarPorIdConRelaciones(avistamientoId);
+            assertNotNull(rec);
+            assertEquals("Read observation", rec.getComentario());
+            assertEquals("MascotaRead", rec.getMascota().getNombre());
+            assertEquals("BarrioAvRead", rec.getUbicacion().getBarrio());
+        } finally {
+            if (avistamientoId != null) try { avistamientoDAO.eliminar(avistamientoId); } catch (Exception ignored) {}
+            if (mascotaId != null) try { mascotaDAO.eliminar(mascotaId); } catch (Exception ignored) {}
+            if (usuarioId != null) try { usuarioDAO.eliminar(usuarioId); } catch (Exception ignored) {}
+        }
+    }
+
+    @Test
+    public void testUpdateAvistamiento() {
+        Long usuarioId = null;
+        Long mascotaId = null;
+        Long avistamientoId = null;
+
+        try {
+            Usuario usuario = new Usuario();
+            usuario.setNombre("Updater");
+            usuario.setApellido("Test");
+            usuario.setEmail("updater@test");
+            usuario.setPassword("pwd");
+            usuario.setRol(rolUsuario);
+            usuario.setEstado(estadoHabilitado);
+            usuarioDAO.persistir(usuario);
+            usuarioId = usuario.getId();
+            assertNotNull(usuarioId);
+
+            Mascota mascota = new Mascota();
+            mascota.setNombre("MascotaUpdate");
+            mascota.setEstado(EstadoMascota.PERDIDO_PROPIO);
+            mascota.setPublicador(usuario);
+            mascota.setTamanio(tamanioMediano);
+            mascota.setUltimaUbicacion(new Ubicacion());
+            mascota.getUltimaUbicacion().setBarrio("BarrioBefore");
+            mascotaDAO.persistir(mascota);
+            mascotaId = mascota.getId();
+            assertNotNull(mascotaId);
+
+            Avistamiento av = new Avistamiento();
+            av.setFecha(LocalDate.now());
+            av.setComentario("Before update");
+            av.setReportador(usuario);
+            av.setMascota(mascota);
+            Ubicacion ub = new Ubicacion();
+            ub.setBarrio("BarrioAvBefore");
+            av.setUbicacion(ub);
+            avistamientoDAO.persistir(av);
+            avistamientoId = av.getId();
+            assertNotNull(avistamientoId);
+
+            Avistamiento toUpdate = avistamientoDAO.recuperarPorIdConRelaciones(avistamientoId);
+            toUpdate.setComentario("After update");
+            toUpdate.getUbicacion().setBarrio("BarrioAvAfter");
+            avistamientoDAO.actualizar(toUpdate);
+
+            Avistamiento updated = avistamientoDAO.recuperarPorIdConRelaciones(avistamientoId);
+            assertNotNull(updated);
+            assertEquals("After update", updated.getComentario());
+            assertEquals("BarrioAvAfter", updated.getUbicacion().getBarrio());
+        } finally {
+            if (avistamientoId != null) try { avistamientoDAO.eliminar(avistamientoId); } catch (Exception ignored) {}
+            if (mascotaId != null) try { mascotaDAO.eliminar(mascotaId); } catch (Exception ignored) {}
+            if (usuarioId != null) try { usuarioDAO.eliminar(usuarioId); } catch (Exception ignored) {}
+        }
+    }
+
+    @Test
+    public void testDeleteAvistamiento() {
+        Long usuarioId = null;
+        Long mascotaId = null;
+        Long avistamientoId = null;
+
+        try {
+            Usuario usuario = new Usuario();
+            usuario.setNombre("Deleter");
+            usuario.setApellido("Test");
+            usuario.setEmail("deleter@test");
+            usuario.setPassword("pwd");
+            usuario.setRol(rolUsuario);
+            usuario.setEstado(estadoHabilitado);
+            usuarioDAO.persistir(usuario);
+            usuarioId = usuario.getId();
+            assertNotNull(usuarioId);
+
+            Mascota mascota = new Mascota();
+            mascota.setNombre("MascotaDelete");
+            mascota.setEstado(EstadoMascota.PERDIDO_PROPIO);
+            mascota.setPublicador(usuario);
+            mascota.setTamanio(tamanioMediano);
+            mascota.setUltimaUbicacion(new Ubicacion());
+            mascota.getUltimaUbicacion().setBarrio("BarrioDelete");
+            mascotaDAO.persistir(mascota);
+            mascotaId = mascota.getId();
+            assertNotNull(mascotaId);
+
+            Avistamiento av = new Avistamiento();
+            av.setFecha(LocalDate.now());
+            av.setComentario("To be deleted");
+            av.setReportador(usuario);
+            av.setMascota(mascota);
+            Ubicacion ub = new Ubicacion();
+            ub.setBarrio("BarrioAvDelete");
+            av.setUbicacion(ub);
+            avistamientoDAO.persistir(av);
+            avistamientoId = av.getId();
+            assertNotNull(avistamientoId);
+
+            avistamientoDAO.eliminar(avistamientoId);
+
+            try {
+                Avistamiento rec = avistamientoDAO.recuperarPorIdConRelaciones(avistamientoId);
+                assertNull(rec, "Avistamiento should be null after deletion");
+            } catch (Exception expected) {
+                // If DAO throws when not found, accept as successful delete
             }
-            if (mascotaId != null) {
-                try { mascotaDAO.eliminar(mascotaId); } catch (Exception ignored) {}
-            }
-            if (usuarioId != null) {
-                try { usuarioDAO.eliminar(usuarioId); } catch (Exception ignored) {}
-            }
+        } finally {
+            if (avistamientoId != null) try { avistamientoDAO.eliminar(avistamientoId); } catch (Exception ignored) {}
+            if (mascotaId != null) try { mascotaDAO.eliminar(mascotaId); } catch (Exception ignored) {}
+            if (usuarioId != null) try { usuarioDAO.eliminar(usuarioId); } catch (Exception ignored) {}
         }
     }
 }

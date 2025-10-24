@@ -53,29 +53,99 @@ public class Usuario {
     )
     private Set<Medalla> medallas = new HashSet<>();
 
-    public Usuario() {}
+    public Usuario() {
+    }
 
     // Getters y Setters...
-    public Long getId() { return id; }
-    public String getNombre() { return nombre; }
-    public String getApellido() { return apellido; }
-    public String getEmail() { return email; }
-    public String getPassword() { return password; }
-    public String getTelefono() { return telefono; }
-    public String getCiudad() { return ciudad; }
-    public Integer getPuntos() { return puntos; }
-    public Rol getRol() { return rol; }
-    public EstadoUsuario getEstado() { return estado; }
-    public void setNombre(String nombre) { this.nombre = nombre; }
-    public void setApellido(String apellido) { this.apellido = apellido; }
-    public void setEmail(String email) { this.email = email; }
-    public void setPassword(String password) { this.password = password; }
-    public void setRol(Rol rol) { this.rol = rol; }
-    public void setEstado(EstadoUsuario estado) { this.estado = estado; }
-    public List<Mascota> getMascotasPublicadas() { return mascotasPublicadas;}
-    public void setMascotasPublicadas(List<Mascota> mascotasPublicadas) {  this.mascotasPublicadas = mascotasPublicadas; }
-    public Set<Medalla> getMedallas() {return this.medallas;}
-    public void setMedallas(Set<Medalla> medallas) { this.medallas = medallas; }
-    public List<Avistamiento> getAvistamientosReportados() {return avistamientosReportados;}
-    public void setAvistamientosReportados(List<Avistamiento> avistamientosReportados) {this.avistamientosReportados = avistamientosReportados;}
+    public Long getId() {
+        return id;
+    }
+
+    public String getNombre() {
+        return nombre;
+    }
+
+    public String getApellido() {
+        return apellido;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public String getTelefono() {
+        return telefono;
+    }
+
+    public String getCiudad() {
+        return ciudad;
+    }
+
+    public Integer getPuntos() {
+        return puntos;
+    }
+
+    public Rol getRol() {
+        return rol;
+    }
+
+    public EstadoUsuario getEstado() {
+        return estado;
+    }
+
+    public void setNombre(String nombre) {
+        this.nombre = nombre;
+    }
+
+    public void setApellido(String apellido) {
+        this.apellido = apellido;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public void setRol(Rol rol) {
+        this.rol = rol;
+    }
+
+    public void setEstado(EstadoUsuario estado) {
+        this.estado = estado;
+    }
+
+    public List<Mascota> getMascotasPublicadas() {
+        return mascotasPublicadas;
+    }
+
+    public void setMascotasPublicadas(List<Mascota> mascotasPublicadas) {
+        this.mascotasPublicadas = mascotasPublicadas;
+    }
+
+    public Set<Medalla> getMedallas() {
+        return this.medallas;
+    }
+
+    public void setMedallas(Set<Medalla> medallas) {
+        this.medallas = medallas;
+    }
+
+    public List<Avistamiento> getAvistamientosReportados() {
+        return avistamientosReportados;
+    }
+
+    public void setAvistamientosReportados(List<Avistamiento> avistamientosReportados) {
+        this.avistamientosReportados = avistamientosReportados;
+    }
+
+    public void addMedalla(Medalla medalla) {
+        this.medallas.add(medalla);
+    }
 }

@@ -20,15 +20,10 @@ public class Mascota {
     private String descripcion;
     private LocalDate fechaPublicacion;
 
-    /**
-     * El único Enum del sistema.
-     * Se guarda como String en la BD.
-     */
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private EstadoMascota estado;
 
-    // --- Relaciones con Catálogos ---
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "tamanio_mascota_id")
     private TamanioMascota tamanio;
@@ -50,7 +45,13 @@ public class Mascota {
     private List<Avistamiento> avistamientos = new ArrayList<>();
 
     public Mascota() {}
-    // Getters y Setters...
+    public Mascota(String nombre, EstadoMascota estado, String color , String descripcion) {
+        this.color = color;
+        this.descripcion = descripcion;
+        this.nombre = nombre;
+        this.estado = estado;
+        this.fechaPublicacion = LocalDate.now();
+    }
     public Long getId() { return id; }
     public void setNombre(String nombre) { this.nombre = nombre; }
     public void setEstado(EstadoMascota estado) { this.estado = estado; }
@@ -61,4 +62,71 @@ public class Mascota {
     public Usuario getPublicador() { return publicador; }
     public void setUltimaUbicacion(Ubicacion ubicacion) { this.ultimaUbicacion = ubicacion; }
     public Ubicacion getUltimaUbicacion() { return ultimaUbicacion; }
+    public String getColor() {
+        return color;
+    }
+
+    public void setColor(String color) {
+        this.color = color;
+    }
+
+    public String getDescripcion() {
+        return descripcion;
+    }
+
+    public void setDescripcion(String descripcion) {
+        this.descripcion = descripcion;
+    }
+
+    public LocalDate getFechaPublicacion() {
+        return fechaPublicacion;
+    }
+
+    public void setFechaPublicacion(LocalDate fechaPublicacion) {
+        this.fechaPublicacion = fechaPublicacion;
+    }
+
+    public TamanioMascota getTamanio() {
+        return tamanio;
+    }
+
+    public List<Foto> getFotos() {
+        return fotos;
+    }
+    public void setFotos(List<Foto> fotos) {
+        this.fotos = (fotos != null) ? fotos : new ArrayList<>();
+    }
+    public void addFoto(Foto foto) {
+            this.fotos.add(foto);
+
+    }
+    public void removeFoto(Foto foto) {
+        this.fotos.remove(foto);
+    }
+    public List<Avistamiento> getAvistamientos() {
+        return avistamientos;
+    }
+    public void setAvistamientos(List<Avistamiento> avistamientos) {
+        this.avistamientos = (avistamientos != null) ? avistamientos : new ArrayList<>();
+    }
+    public void addAvistamiento(Avistamiento avistamiento) {
+        if (avistamiento != null) {
+            this.avistamientos.add(avistamiento);
+            // keep bidirectional consistency if Avistamiento has setMascota(...)
+            try {
+                avistamiento.setMascota(this);
+            } catch (Exception ignored) { }
+        }
+    }
+    public void removeAvistamiento(Avistamiento avistamiento) {
+        if (avistamiento != null) {
+            this.avistamientos.remove(avistamiento);
+            try {
+                if (avistamiento.getMascota() == this) {
+                    avistamiento.setMascota(null);
+                }
+            } catch (Exception ignored) { }
+        }
+    }
+
 }

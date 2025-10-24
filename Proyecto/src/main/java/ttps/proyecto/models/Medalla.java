@@ -34,4 +34,5 @@ public class Medalla {
     public void setDescripcion(String descripcion){this.descripcion = descripcion;}
     public Set<Usuario> getUsuarios() {return this.usuarios;}
     public void setUsuarios(Set<Usuario> usuarios) {this.usuarios = usuarios;}
+    public void setUsuario(Usuario usuario) {this.usuarios.add(usuario);}
 }
