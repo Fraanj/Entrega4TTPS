@@ -2,7 +2,6 @@ package ttps.proyecto.models;
 
 import jakarta.persistence.*;
 import ttps.proyecto.models.enums.EstadoMascota; // El único Enum
-import ttps.proyecto.models.TamanioMascota; // Es entidad
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;

@@ -1,8 +1,6 @@
 package ttps.proyecto.models;
 
 import jakarta.persistence.*;
-import ttps.proyecto.models.EstadoUsuario;
-import ttps.proyecto.models.Rol;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
