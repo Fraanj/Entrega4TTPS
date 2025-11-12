@@ -117,6 +117,14 @@ public class Usuario {
         this.rol = rol;
     }
 
+    public void setTelefono(String telefono) {
+        this.telefono = telefono;
+    }
+
+    public void setCiudad(String ciudad) {
+        this.ciudad = ciudad;
+    }
+
     public void setEstado(EstadoUsuario estado) {
         this.estado = estado;
     }
