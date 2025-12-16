@@ -2,6 +2,7 @@ package ttps.proyecto.dto;
 
 import ttps.proyecto.models.enums.EstadoMascota;
 import java.time.LocalDate;
+import java.util.List;
 
 public class MascotaDto {
     private Long id;
@@ -14,6 +15,7 @@ public class MascotaDto {
     private Long publicadorId;
     private String publicadorNombre;
     private UbicacionDto ubicacion;
+    private List<String> fotosUrls;
 
     // Constructores
     public MascotaDto() {}
@@ -48,4 +50,7 @@ public class MascotaDto {
     
     public UbicacionDto getUbicacion() { return ubicacion; }
     public void setUbicacion(UbicacionDto ubicacion) { this.ubicacion = ubicacion; }
+
+    public List<String> getFotosUrls() { return fotosUrls; }
+    public void setFotosUrls(List<String> fotosUrls) { this.fotosUrls = fotosUrls; }
 }

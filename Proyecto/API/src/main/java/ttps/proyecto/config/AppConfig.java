@@ -9,6 +9,7 @@ import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.springframework.web.client.RestTemplate;
 
 import jakarta.persistence.EntityManagerFactory;
 import javax.sql.DataSource;
@@ -99,5 +100,13 @@ public class AppConfig {
         // Se asocia al EntityManagerFactory definido arriba
         transactionManager.setEntityManagerFactory(emf);
         return transactionManager;
+    }
+
+    /**
+     * Bean de RestTemplate para realizar peticiones HTTP a APIs externas.
+     */
+    @Bean
+    public RestTemplate restTemplate() {
+        return new RestTemplate();
     }
 }

@@ -1,0 +1,90 @@
+<div class="flex min-h-screen items-center justify-center bg-premium-dark p-6 font-sans">
+  
+    <div class="w-full max-w-2xl rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-md">
+      
+      <div class="mb-8 flex items-center justify-between">
+        <h2 class="text-2xl font-bold text-white">Reportar Mascota</h2>
+        <button routerLink="/" class="text-sm text-slate-400 hover:text-white">✕ Cancelar</button>
+      </div>
+  
+      <form [formGroup]="mascotaForm" (ngSubmit)="onSubmit()" class="space-y-6">
+        
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-300">Nombre *</label>
+            <input formControlName="nombre" type="text" 
+              class="w-full rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none focus:ring-1 focus:ring-indigo-500">
+            <span *ngIf="mascotaForm.get('nombre')?.invalid && mascotaForm.get('nombre')?.touched" class="text-xs text-red-400">Requerido</span>
+          </div>
+  
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-300">Color *</label>
+            <input formControlName="color" type="text" 
+              class="w-full rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none">
+            <span *ngIf="mascotaForm.get('color')?.invalid && mascotaForm.get('color')?.touched" class="text-xs text-red-400">Requerido</span>
+          </div>
+  
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-300">Tamaño</label>
+            <select formControlName="tamanioNombre" 
+              class="w-full rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white focus:border-indigo-500 focus:outline-none">
+              <option value="CHICO">Chico</option>
+              <option value="MEDIANO">Mediano</option>
+              <option value="GRANDE">Grande</option>
+            </select>
+          </div>
+  
+          <div class="space-y-2">
+            <label class="text-sm font-medium text-slate-300">Estado</label>
+            <select formControlName="estado" 
+              class="w-full rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white focus:border-indigo-500 focus:outline-none">
+              <option value="PERDIDO_PROPIO">Perdí mi mascota</option>
+              <option value="PERDIDO_AJENO">Vi una mascota perdida</option>
+            </select>
+          </div>
+        </div>
+  
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-slate-300">Descripción *</label>
+          <textarea formControlName="descripcion" rows="3" 
+            class="w-full rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white placeholder-slate-500 focus:border-indigo-500 focus:outline-none" 
+            placeholder="Detalles que ayuden a identificarla..."></textarea>
+           <span *ngIf="mascotaForm.get('descripcion')?.invalid && mascotaForm.get('descripcion')?.touched" class="text-xs text-red-400">Requerido</span>
+        </div>
+  
+        <div class="space-y-2">
+          <label class="text-sm font-medium text-slate-300">Foto</label>
+          
+          <div class="flex items-center gap-4">
+            <label class="cursor-pointer rounded-lg border border-dashed border-slate-500 p-4 hover:border-indigo-500 hover:bg-white/5 transition-all text-center flex-1">
+              <span class="text-sm text-slate-400">📷 Tocar para subir foto</span>
+              <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+            </label>
+  
+            <div *ngIf="previewUrl" class="relative h-20 w-20 shrink-0">
+              <img [src]="previewUrl" class="h-full w-full rounded-lg object-cover border border-white/20">
+            </div>
+          </div>
+        </div>
+  
+        <div class="space-y-2">
+          <div class="flex justify-between">
+            <label class="text-sm font-medium text-slate-300">Ubicación *</label>
+            <span *ngIf="ubicacionError" class="text-sm font-bold text-red-500 animate-pulse">⚠️ DEBE MARCAR UN PUNTO EN EL MAPA</span>
+          </div>
+          
+          <div id="map" class="h-64 w-full rounded-xl border-2 shadow-inner transition-all"
+               [ngClass]="{'border-red-500': ubicacionError, 'border-white/10': !ubicacionError}">
+          </div>
+          <p class="text-xs text-slate-500">Hacé click en el mapa donde viste o perdiste a la mascota.</p>
+        </div>
+  
+        <button type="submit" [disabled]="loading"
+          class="w-full rounded-xl bg-indigo-600 py-4 font-bold text-white shadow-lg shadow-indigo-500/40 transition-all hover:bg-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed">
+          {{ loading ? 'Guardando...' : 'Publicar Mascota' }}
+        </button>
+  
+      </form>
+    </div>
+  </div>

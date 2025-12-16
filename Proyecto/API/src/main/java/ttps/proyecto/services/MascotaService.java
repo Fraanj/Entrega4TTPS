@@ -1,6 +1,7 @@
 package ttps.proyecto.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import ttps.proyecto.dto.MascotaDto;
@@ -9,6 +10,7 @@ import ttps.proyecto.models.Mascota;
 import ttps.proyecto.models.TamanioMascota;
 import ttps.proyecto.models.Ubicacion;
 import ttps.proyecto.models.Usuario;
+import ttps.proyecto.models.Foto;
 import ttps.proyecto.models.enums.EstadoMascota;
 import ttps.proyecto.repositories.MascotaRepository;
 import ttps.proyecto.repositories.TamanioMascotaRepository;
@@ -17,11 +19,15 @@ import ttps.proyecto.repositories.UsuarioRepository;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class MascotaService {
+
+    @Autowired
+    private RestTemplate restTemplate; // Inyectamos el cliente HTTP
 
     @Autowired
     private MascotaRepository mascotaRepository;
@@ -47,13 +53,49 @@ public class MascotaService {
         mascota.setFechaPublicacion(LocalDate.now());
         mascota.setPublicador(publicador);
         mascota.setTamanio(tamanio);
-        
+
+        // Lógica GeoRef (Requisito del TP)
         if (dto.getUbicacion() != null) {
             Ubicacion ubicacion = new Ubicacion();
-            ubicacion.setBarrio(dto.getUbicacion().getBarrio());
-            ubicacion.setLatitud(dto.getUbicacion().getLatitud());
-            ubicacion.setLongitud(dto.getUbicacion().getLongitud());
+            Double lat = dto.getUbicacion().getLatitud();
+            Double lon = dto.getUbicacion().getLongitud();
+            
+            ubicacion.setLatitud(lat);
+            ubicacion.setLongitud(lon);
+
+            // LLAMADA A API EXTERNA
+            try {
+                String url = String.format("https://apis.datos.gob.ar/georef/api/ubicacion?lat=%s&lon=%s", lat, lon);
+                // Mapeamos la respuesta a un objeto auxiliar o un Map (por simplicidad usamos Map)
+                Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+                
+                if (response != null && response.containsKey("ubicacion")) {
+                    Map<String, Object> ubiData = (Map<String, Object>) response.get("ubicacion");
+                    
+                    // Obtenemos municipio o departamento según corresponda
+                    Map<String, Object> municipio = (Map<String, Object>) ubiData.get("municipio");
+                    Map<String, Object> provincia = (Map<String, Object>) ubiData.get("provincia");
+                    
+                    String nombreBarrio = municipio.get("nombre") != null ? (String) municipio.get("nombre") : (String) provincia.get("nombre");
+                    ubicacion.setBarrio(nombreBarrio); // Guardamos el dato real obtenido de la API
+                } else {
+                    ubicacion.setBarrio("Desconocido");
+                }
+            } catch (Exception e) {
+                System.out.println("Error conectando con GeoRef: " + e.getMessage());
+                ubicacion.setBarrio("Ubicación Manual"); // Fallback
+            }
+
             mascota.setUltimaUbicacion(ubicacion);
+        }
+        
+        // Manejo de Fotos
+        if (dto.getFotosUrls() != null && !dto.getFotosUrls().isEmpty()) {
+            for (String url : dto.getFotosUrls()) {
+                Foto foto = new Foto();
+                foto.setUrl(url); // Aquí guardamos la URL o el Base64
+                mascota.addFoto(foto); // Usamos el helper method de la entidad
+            }
         }
 
         Mascota saved = mascotaRepository.save(mascota);

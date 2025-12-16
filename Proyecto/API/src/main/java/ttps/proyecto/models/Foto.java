@@ -10,9 +10,17 @@ public class Foto {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(columnDefinition = "LONGTEXT", nullable = false)
     private String url;
 
     // Constructor vacío, Getters y Setters...
     public Foto() {}
+
+    public String getUtl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
+    }
 }
