@@ -1,0 +1,133 @@
+<div class="flex min-h-screen font-sans text-white bg-premium-dark">
+  
+  <aside class="hidden w-64 flex-col border-r border-white/10 bg-white/5 p-6 backdrop-blur-xl md:flex">
+    
+    <div class="mb-10 flex items-center gap-3 px-2">
+      <div class="text-2xl">🐶</div>
+      <span class="text-xl font-bold tracking-tight">¿Dónde estás?</span>
+    </div>
+    
+    <nav class="flex flex-1 flex-col gap-2">
+      <a class="flex cursor-pointer items-center gap-3 rounded-xl bg-indigo-600 px-4 py-3 font-medium text-white shadow-lg shadow-indigo-500/30 transition-all">
+        <span>🏠</span> Dashboard
+      </a>
+      <a routerLink="/mascota/nuevo" class="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all">
+        <span>🐾</span> Mascotas
+      </a>
+      <a class="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all">
+        <span>🗺️</span> Mapa
+      </a>
+      <a class="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all">
+        <span>🏆</span> Ranking
+      </a>
+    </nav>
+
+    <div class="mt-auto flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
+      <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-sm font-bold">
+        Yo
+      </div>
+      <div class="flex flex-col">
+        <span class="text-sm font-bold">Joaco</span>
+        <span class="text-xs text-slate-400">Usuario</span>
+      </div>
+    </div>
+  </aside>
+
+  <main class="flex-1 overflow-y-auto p-8">
+    
+    <header class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
+      <div>
+        <h1 class="text-3xl font-bold text-white">Hola, Joaco 👋</h1>
+        <p class="mt-1 text-slate-400">Vamos a encontrar a todos hoy.</p>
+      </div>
+      <button 
+        routerLink="/mascota/nuevo"
+        class="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-500/40 transition-all hover:scale-105 hover:bg-indigo-500 active:scale-95">
+        <span>+</span> Reportar
+      </button>
+    </header>
+
+    <section class="mb-10 grid grid-cols-1 gap-6 md:grid-cols-3">
+      <div class="flex cursor-default items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all hover:bg-white/10">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-red-500/20 text-xl text-red-400">🚨</div>
+        <div class="flex flex-col">
+          <span class="text-3xl font-bold leading-none">{{ estadisticas.perdidas }}</span>
+          <span class="mt-1 text-sm font-medium text-slate-400">Perdidas</span>
+        </div>
+      </div>
+
+      <div class="flex cursor-default items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all hover:bg-white/10">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-emerald-500/20 text-xl text-emerald-400">🎉</div>
+        <div class="flex flex-col">
+          <span class="text-3xl font-bold leading-none">{{ estadisticas.recuperadas }}</span>
+          <span class="mt-1 text-sm font-medium text-slate-400">Recuperadas</span>
+        </div>
+      </div>
+
+      <div class="flex cursor-default items-center gap-4 rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md transition-all hover:bg-white/10">
+        <div class="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/20 text-xl text-blue-400">🏠</div>
+        <div class="flex flex-col">
+          <span class="text-3xl font-bold leading-none">{{ estadisticas.adoptadas }}</span>
+          <span class="mt-1 text-sm font-medium text-slate-400">Adoptadas</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      
+      <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md lg:col-span-2">
+        <div class="mb-6 flex items-center justify-between">
+          <h2 class="text-xl font-bold">Actividad Reciente</h2>
+          <a class="cursor-pointer text-sm text-indigo-400 hover:text-indigo-300">Ver todo</a>
+        </div>
+
+        <div class="flex flex-col gap-0">
+          <div *ngFor="let pet of mascotasRecientes" class="flex items-center gap-4 border-b border-white/5 py-4 last:border-0 hover:bg-white/5 transition-colors rounded-xl px-2">
+            <div class="flex h-12 w-12 shrink-0 items-center justify-center rounded-lg bg-slate-700 text-lg font-bold text-slate-300">
+              {{ pet.nombre.charAt(0) }}
+            </div>
+            
+            <div class="flex-1">
+              <span class="block font-semibold text-white">{{ pet.nombre }}</span>
+              <span class="text-sm text-slate-400">{{ pet.ubicacion.barrio }} • {{ pet.tamanioNombre }}</span>
+            </div>
+
+            <div class="flex flex-col items-end gap-1">
+              <span [class]="getEstadoClasses(pet.estado)">
+                {{ getEstadoLabel(pet.estado) }}
+              </span>
+              <span class="text-xs text-slate-500">{{ pet.fecha }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-6">
+        
+        <div class="rounded-2xl bg-linear-to-br from-indigo-600 to-violet-700 p-6 text-white shadow-xl shadow-indigo-900/50">
+          <h3 class="mb-2 text-lg font-bold">¿Viste una mascota sola?</h3>
+          <p class="mb-4 text-sm text-indigo-100">Reportalo en segundos y ayudá a la comunidad.</p>
+          <button routerLink="/avistamientos/nuevo" class="w-full rounded-lg bg-white py-2 font-bold text-indigo-700 transition-colors hover:bg-indigo-50">
+            Reportar Avistamiento
+          </button>
+        </div>
+
+        <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
+          <h3 class="mb-4 font-bold">Top Rescatistas 🏆</h3>
+          <ul class="space-y-3">
+            <li class="flex justify-between border-b border-white/5 pb-2 text-sm last:border-0">
+              <span>🥇 María G.</span> <span class="font-mono text-indigo-400">350 pts</span>
+            </li>
+            <li class="flex justify-between border-b border-white/5 pb-2 text-sm last:border-0">
+              <span>🥈 Carlos R.</span> <span class="font-mono text-indigo-400">210 pts</span>
+            </li>
+            <li class="flex justify-between border-b border-white/5 pb-2 text-sm last:border-0">
+              <span>🥉 Vos</span> <span class="font-mono text-amber-400">180 pts</span>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+  </main>
+</div>
