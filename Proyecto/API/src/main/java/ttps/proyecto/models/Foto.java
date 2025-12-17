@@ -16,7 +16,7 @@ public class Foto {
     // Constructor vacío, Getters y Setters...
     public Foto() {}
 
-    public String getUtl() {
+    public String getUrl() {
         return url;
     }
 

@@ -10,20 +10,30 @@ import * as L from 'leaflet'; // Importamos Leaflet
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, RouterModule],
   templateUrl: './mascota-form.html',
-  styleUrls: ['./mascota-form.css'] // Usa styles global via @tailwind
+  styleUrls: [] // Usa styles global via @tailwind
 })
 export class MascotaFormComponent implements OnInit {
   mascotaForm: FormGroup;
   loading = false;
+
   private map: any;
   private marker: any;
-  selectedLat: number = -34.9214; // Default La Plata
-  selectedLng: number = -57.9546;
+  selectedLat: number | null = null;
+  selectedLng: number | null = null;
+
+  // Coordenadas por defecto SOLO PARA LA VISTA del mapa (La Plata)
+  private defaultLat = -34.9214;
+  private defaultLng = -57.9546;
 
   ubicacionError = false; // Para mostrar mensaje de error
   
-  previewUrl: string | null = null; // Para mostrar la foto cargada
-  fotoBase64: string | null = null; // El string que mandamos al back
+  // Fotos Múltiples
+  fotosBase64: string[] = []; // Array de strings base64
+  MAX_FOTOS = 4;
+
+  // Feedback (Toast Custom)
+  toastMessage: string | null = null;
+  toastType: 'success' | 'error' = 'success';
 
   constructor(
     private fb: FormBuilder,
@@ -45,7 +55,7 @@ export class MascotaFormComponent implements OnInit {
 
   // Inicializa el mapa
   private initMap(): void {
-    this.map = L.map('map').setView([this.selectedLat, this.selectedLng], 13);
+    this.map = L.map('map').setView([this.defaultLat, this.defaultLng], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
@@ -62,43 +72,53 @@ export class MascotaFormComponent implements OnInit {
     if (this.marker) {
       this.map.removeLayer(this.marker);
     }
-    // Usamos un círculo simple si el ícono falla, o un marcador estándar
-    this.marker = L.circleMarker([lat, lng], { radius: 8, color: 'blue' }).addTo(this.map);
+
+    this.marker = L.circleMarker([lat, lng], { radius: 8, color: '#4f46e5', fillOpacity: 0.8 }).addTo(this.map);
     
     this.selectedLat = lat;
     this.selectedLng = lng;
     this.ubicacionError = false; // Limpiamos el error si selecciona algo
   }
 
-  // --- LÓGICA DE FOTO (BASE64) ---
+  // --- FOTOS MÚLTIPLES ---
   onFileSelected(event: any): void {
+    if (this.fotosBase64.length >= this.MAX_FOTOS) {
+      this.showToast('Máximo 4 fotos permitidas', 'error');
+      return;
+    }
+
     const file = event.target.files[0];
     if (file) {
-      // Validar tamaño (ej: max 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        alert('La imagen es muy pesada (Máx 2MB)');
+        this.showToast('La imagen es muy pesada (Máx 2MB)', 'error');
         return;
       }
 
       const reader = new FileReader();
       reader.onload = (e: any) => {
-        this.previewUrl = e.target.result; // Para mostrar en el <img>
-        this.fotoBase64 = e.target.result; // String completo data:image/jpeg;base64,...
+        // Agregamos al array
+        this.fotosBase64.push(e.target.result);
+        event.target.value = ''; // Reset input para poder subir la misma si se borró
       };
       reader.readAsDataURL(file);
     }
   }
 
+  removeFoto(index: number): void {
+    this.fotosBase64.splice(index, 1);
+  }
+
+  // --- SUBMIT ---
   onSubmit(): void {
-    // 1. Validar Formulario de texto
     if (this.mascotaForm.invalid) {
-      this.mascotaForm.markAllAsTouched(); // Para que se pongan rojos los inputs
+      this.mascotaForm.markAllAsTouched();
+      this.showToast('Por favor completá los campos requeridos', 'error');
       return;
     }
 
-    // 2. Validar Mapa
     if (this.selectedLat === null || this.selectedLng === null) {
       this.ubicacionError = true;
+      this.showToast('Falta marcar la ubicación en el mapa', 'error');
       return;
     }
 
@@ -106,30 +126,38 @@ export class MascotaFormComponent implements OnInit {
     const formValue = this.mascotaForm.value;
 
     const nuevaMascota = {
-      nombre: formValue.nombre,
-      descripcion: formValue.descripcion,
-      color: formValue.color,
-      tamanioNombre: formValue.tamanioNombre,
-      estado: formValue.estado,
+      ...formValue,
       ubicacion: {
         latitud: this.selectedLat,
         longitud: this.selectedLng,
-        barrio: '' // El back se encarga
+        barrio: '' 
       },
-      // Mandamos la foto real si existe
-      fotosUrls: this.fotoBase64 ? [this.fotoBase64] : []
+      fotos: this.fotosBase64 // Mandamos el array completo
     };
 
     this.mascotaService.crearMascota(nuevaMascota).subscribe({
-      next: (res) => {
-        alert('¡Mascota publicada con éxito!');
-        this.router.navigate(['/']);
+      next: () => {
+        this.showToast('¡Mascota publicada con éxito!', 'success');
+        setTimeout(() => this.router.navigate(['/']), 2000); // Esperar a leer el mensaje
       },
       error: (err) => {
-        console.error('Error', err);
+        console.error(err);
         this.loading = false;
-        alert('Error al guardar. Chequeá que el backend soporte archivos grandes (LONGTEXT en DB).');
+        this.showToast('Error al guardar. Intenta nuevamente.', 'error');
       }
     });
+  }
+
+  // Helper para validaciones en HTML
+  isFieldInvalid(fieldName: string): boolean {
+    const field = this.mascotaForm.get(fieldName);
+    return !!(field && field.invalid && field.touched);
+  }
+
+  // Helper Toast
+  private showToast(msg: string, type: 'success' | 'error') {
+    this.toastMessage = msg;
+    this.toastType = type;
+    setTimeout(() => this.toastMessage = null, 4000); // Ocultar a los 4s
   }
 }

@@ -67,7 +67,9 @@ public class MascotaService {
             try {
                 String url = String.format("https://apis.datos.gob.ar/georef/api/ubicacion?lat=%s&lon=%s", lat, lon);
                 // Mapeamos la respuesta a un objeto auxiliar o un Map (por simplicidad usamos Map)
+                System.out.println("LLAMADA A GEOREF");
                 Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+                System.out.println("FINALIZO LLAMADA A GEOREF");
                 
                 if (response != null && response.containsKey("ubicacion")) {
                     Map<String, Object> ubiData = (Map<String, Object>) response.get("ubicacion");
@@ -90,8 +92,8 @@ public class MascotaService {
         }
         
         // Manejo de Fotos
-        if (dto.getFotosUrls() != null && !dto.getFotosUrls().isEmpty()) {
-            for (String url : dto.getFotosUrls()) {
+        if (dto.getFotos() != null && !dto.getFotos().isEmpty()) {
+            for (String url : dto.getFotos()) {
                 Foto foto = new Foto();
                 foto.setUrl(url); // Aquí guardamos la URL o el Base64
                 mascota.addFoto(foto); // Usamos el helper method de la entidad
@@ -184,6 +186,10 @@ public class MascotaService {
             ubicacionDto.setLongitud(mascota.getUltimaUbicacion().getLongitud());
             dto.setUbicacion(ubicacionDto);
         }
+
+        dto.setFotos(mascota.getFotos().stream()
+            .map(Foto::getUrl) 
+            .collect(Collectors.toList()));
         
         return dto;
     }
