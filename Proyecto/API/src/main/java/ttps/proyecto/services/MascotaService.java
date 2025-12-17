@@ -161,6 +161,12 @@ public class MascotaService {
             .collect(Collectors.toList());
     }
 
+    public List<MascotaDto> obtenerTodas() {
+        return mascotaRepository.findAll().stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+    }
+
     private MascotaDto convertToDto(Mascota mascota) {
         MascotaDto dto = new MascotaDto();
         dto.setId(mascota.getId());

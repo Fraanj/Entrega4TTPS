@@ -1,0 +1,87 @@
+<div class="min-h-screen bg-premium-dark p-6 font-sans text-white flex items-center justify-center">
+  
+    <div *ngIf="loading" class="text-slate-500 animate-pulse">Cargando detalles...</div>
+  
+    <div *ngIf="!loading && pet" class="w-full max-w-5xl">
+      
+      <button routerLink="/mascotas" class="mb-6 flex items-center gap-2 text-slate-400 hover:text-white transition-colors group">
+        <span class="group-hover:-translate-x-1 transition-transform">←</span> Volver al listado
+      </button>
+  
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12">
+        
+        <div class="space-y-4">
+          <div class="aspect-square bg-slate-800 rounded-2xl overflow-hidden border border-white/10 shadow-2xl relative group">
+            <img *ngIf="fotoSeleccionada" [src]="fotoSeleccionada" class="w-full h-full object-cover">
+            
+            <div *ngIf="!fotoSeleccionada" class="w-full h-full flex items-center justify-center text-8xl text-slate-700 font-bold select-none">
+              {{ pet.nombre.charAt(0) }}
+            </div>
+            
+            <div class="absolute top-4 left-4 px-4 py-1.5 rounded-full text-sm font-bold shadow-lg backdrop-blur-md"
+                 [ngClass]="pet.estado === 'PERDIDO_PROPIO' ? 'bg-red-500 text-white' : 'bg-amber-500 text-white'">
+              {{ pet.estado === 'PERDIDO_PROPIO' ? 'PERDIDO' : 'VISTO' }}
+            </div>
+          </div>
+  
+          <div *ngIf="pet.fotos?.length > 1" class="flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
+            <button *ngFor="let foto of pet.fotos" 
+                    (click)="seleccionarFoto(foto)"
+                    class="h-20 w-20 shrink-0 rounded-lg overflow-hidden border-2 border-transparent hover:border-indigo-500 transition-all focus:outline-none focus:ring-2 ring-indigo-500 bg-slate-800">
+              <img [src]="getFotoSegura(foto)" class="w-full h-full object-cover opacity-70 hover:opacity-100 transition-opacity">
+            </button>
+          </div>
+        </div>
+  
+        <div class="flex flex-col justify-center space-y-8">
+          
+          <div>
+            <h1 class="text-5xl font-bold text-white mb-2">{{ pet.nombre }}</h1>
+            <div class="flex flex-wrap items-center gap-4 text-slate-400 text-lg">
+              <span class="flex items-center gap-1 text-indigo-400">📍 {{ pet.ubicacion?.barrio || 'Sin zona' }}</span>
+              <span class="text-slate-600">•</span>
+              <span>📅 {{ pet.fechaPublicacion | date:'dd/MM/yyyy' }}</span>
+            </div>
+          </div>
+  
+          <div class="grid grid-cols-2 gap-4">
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+              <p class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Tamaño</p>
+              <p class="text-xl font-medium text-white">{{ pet.tamanioNombre }}</p>
+            </div>
+            <div class="p-4 bg-white/5 rounded-xl border border-white/10">
+              <p class="text-xs text-slate-500 uppercase font-bold tracking-wider mb-1">Color</p>
+              <p class="text-xl font-medium text-white">{{ pet.color }}</p>
+            </div>
+          </div>
+  
+          <div>
+            <h3 class="text-lg font-bold text-white mb-3">Sobre la mascota</h3>
+            <p class="text-slate-300 leading-relaxed text-lg font-light">
+              {{ pet.descripcion }}
+            </p>
+          </div>
+  
+          <div class="flex items-center gap-4 p-4 bg-indigo-500/10 rounded-xl border border-indigo-500/20">
+            <div class="h-12 w-12 rounded-full bg-indigo-600 flex items-center justify-center text-white font-bold text-xl">
+              {{ pet.publicadorNombre?.charAt(0) }}
+            </div>
+            <div>
+              <p class="text-xs font-bold text-indigo-400 uppercase tracking-wide">Publicado por</p>
+              <p class="text-base text-white font-medium">{{ pet.publicadorNombre }}</p>
+            </div>
+          </div>
+  
+          <div class="pt-4">
+            <button class="w-full bg-white text-indigo-900 font-bold py-4 rounded-xl shadow-xl shadow-indigo-900/20 hover:bg-indigo-50 transition-all active:scale-[0.99] flex items-center justify-center gap-3 text-lg">
+              <span>👁️</span> Reportar Avistamiento
+            </button>
+            <p class="text-center text-xs text-slate-500 mt-3">
+              Si viste a esta mascota, avísale al dueño haciendo click arriba.
+            </p>
+          </div>
+  
+        </div>
+      </div>
+    </div>
+  </div>

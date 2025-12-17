@@ -1,34 +1,4 @@
 <div class="flex min-h-screen font-sans text-white bg-premium-dark">
-  
-  <aside class="hidden w-64 flex-col border-r border-white/10 bg-white/5 p-6 backdrop-blur-xl md:flex">
-    <div class="mb-10 flex items-center gap-3 px-2">
-      <div class="text-2xl">🐶</div>
-      <span class="text-xl font-bold tracking-tight">¿Dónde estás?</span>
-    </div>
-    <nav class="flex flex-1 flex-col gap-2">
-      <a class="flex cursor-pointer items-center gap-3 rounded-xl bg-indigo-600 px-4 py-3 font-medium text-white shadow-lg shadow-indigo-500/30 transition-all">
-        <span>🏠</span> Dashboard
-      </a>
-      <a routerLink="/mascota/nuevo" class="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all">
-        <span>🐾</span> Mascotas
-      </a>
-      <a class="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all">
-        <span>🗺️</span> Mapa
-      </a>
-      <a class="flex cursor-pointer items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-all">
-        <span>🏆</span> Ranking
-      </a>
-    </nav>
-    <div class="mt-auto flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
-      <div class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 text-sm font-bold">
-        Yo
-      </div>
-      <div class="flex flex-col">
-        <span class="text-sm font-bold">Joaco</span>
-        <span class="text-xs text-slate-400">Usuario</span>
-      </div>
-    </div>
-  </aside>
 
   <main class="flex-1 overflow-y-auto p-8">
     
@@ -40,7 +10,7 @@
       <button 
         routerLink="/mascota/nuevo"
         class="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-500/40 transition-all hover:scale-105 hover:bg-indigo-500 active:scale-95">
-        <span>+</span> Reportar
+        <span>+</span> Reportar Mascota
       </button>
     </header>
 
@@ -73,7 +43,11 @@
       <div class="rounded-2xl border border-white/10 bg-white/5 p-6 backdrop-blur-md lg:col-span-2">
         <div class="mb-6 flex items-center justify-between">
           <h2 class="text-xl font-bold">Actividad Reciente</h2>
-          <a class="cursor-pointer text-sm text-indigo-400 hover:text-indigo-300">Ver todo</a>
+          <button 
+            routerLink="/mascotas"
+            class="cursor-pointer text-sm text-indigo-400 hover:text-indigo-300">
+            Ver todo
+          </button>
         </div>
 
         <div *ngIf="loading" class="py-10 text-center text-slate-500 animate-pulse">
@@ -93,7 +67,9 @@
 
         <div *ngIf="!loading && mascotasRecientes.length > 0" class="flex flex-col gap-0">
           
-          <div *ngFor="let pet of mascotasRecientes" class="group flex items-start gap-4 border-b border-white/5 py-4 last:border-0 hover:bg-white/5 transition-colors rounded-xl px-3 cursor-pointer">
+          <div *ngFor="let pet of mascotasRecientes" 
+            [routerLink]="['/mascota', pet.id]"
+            class="group flex items-start gap-4 border-b border-white/5 py-4 last:border-0 hover:bg-white/5 transition-colors rounded-xl px-3 cursor-pointer">
             
             <div class="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-slate-800 relative border border-white/10 group-hover:border-indigo-500/50 transition-all shadow-sm mt-1">
                <ng-container *ngIf="pet.fotos && pet.fotos.length > 0">
@@ -116,15 +92,15 @@
                     <span class="text-xs text-slate-500">• {{ pet.tamanioNombre }}</span>
                   </div>
                   <div class="flex items-center gap-1 text-xs text-indigo-300/80 font-medium mb-1">
-                    <span>📍</span> {{ pet.ubicacion?.barrio || 'La Plata' }}
+                    <span>📍</span> {{ pet.ubicacion?.barrio || 'Desconocido' }}
                   </div>
                 </div>
                 
-                <div class="flex flex-col items-end gap-1.5 shrink-0 ml-2">
+                <div class="flex flex-col items-end gap-1.5 shrink-0 ml-1.5">
                   <span [class]="getEstadoClasses(pet.estado)">
                     {{ getEstadoLabel(pet.estado) }}
                   </span>
-                  <span class="text-xs text-slate-500 font-mono">{{ pet.fechaPublicacion | date:'dd/MM/yyyy' }}</span>
+                  <span class="text-m text-slate-500 font-mono">{{ pet.fechaPublicacion | date:'dd/MM/yyyy' }}</span>
                 </div>
               </div>
 

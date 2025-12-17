@@ -1,0 +1,61 @@
+<div class="flex min-h-screen font-sans text-white bg-premium-dark">
+
+    <!-- SIDEBAR -->
+    <aside class="hidden w-64 flex-col border-r border-white/10 bg-white/5 p-6 backdrop-blur-xl md:flex">
+      <div class="mb-10 flex items-center gap-3 px-2">
+        <div class="text-2xl">🐶</div>
+        <span class="text-xl font-bold tracking-tight">¿Dónde estás?</span>
+      </div>
+  
+      <nav class="flex flex-1 flex-col gap-2">
+        <a
+            routerLink="/"
+            routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+            [routerLinkActiveOptions]="{ exact: true }"
+            class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors
+                   [&:not(.router-link-active)]:hover:bg-white/10
+                   [&.router-link-active]:hover:bg-indigo-600">
+          <span>🏠</span> Dashboard
+        </a>
+  
+        <a routerLink="/mascotas"
+        routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors
+               [&:not(.router-link-active)]:hover:bg-white/10
+               [&.router-link-active]:hover:bg-indigo-600">
+          <span>🐾</span> Mascotas
+        </a>
+  
+        <a routerLink="/mapa"
+            routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+            class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors hover:bg-white/10
+        [&.router-link-active]:hover:bg-indigo-600">
+          <span>🗺️</span> Mapa
+        </a>
+  
+        <a routerLink="/ranking"
+        routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+        class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors hover:bg-white/10
+      [&.router-link-active]:hover:bg-indigo-600">
+          <span>🏆</span> Ranking
+        </a>
+      </nav>
+  
+      <div class="mt-auto flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
+        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 text-sm font-bold">
+          Yo
+        </div>
+        <div class="flex flex-col">
+          <span class="text-sm font-bold">Joaco</span>
+          <span class="text-xs text-slate-400">Usuario</span>
+        </div>
+      </div>
+    </aside>
+  
+    <!-- CONTENIDO DINÁMICO -->
+    <main class="flex-1 overflow-y-auto p-8">
+      <router-outlet></router-outlet>
+    </main>
+  
+  </div>  

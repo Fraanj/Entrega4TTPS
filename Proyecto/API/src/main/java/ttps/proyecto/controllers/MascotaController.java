@@ -49,6 +49,12 @@ public class MascotaController {
         return ResponseEntity.ok(mascotas);
     }
 
+    @GetMapping("/obtenerTodas")
+    public ResponseEntity<List<MascotaDto>> obtenerTodas() {
+        List<MascotaDto> mascotas = mascotaService.obtenerTodas();
+        return ResponseEntity.ok(mascotas);
+    }
+
     @PutMapping("/{id}")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody MascotaDto dto) {
         try {

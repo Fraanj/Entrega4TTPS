@@ -1,0 +1,55 @@
+<div class="min-h-screen bg-premium-dark p-6 md:p-8 font-sans text-white">
+  
+  <div class="max-w-7xl mx-auto mb-8 flex flex-col md:flex-row justify-between items-center gap-4 border-b border-white/10 pb-6">
+    <div>
+      <h1 class="text-3xl font-bold">Mascotas Perdidas</h1>
+      <p class="text-slate-400 mt-1">Ayudá a que vuelvan a casa.</p>
+    </div>
+    <div class="flex gap-3">
+      <button routerLink="/" class="px-4 py-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-lg transition-colors">
+        Volver al Inicio
+      </button>
+      <button routerLink="/mascota/nuevo" class="px-6 py-2 bg-indigo-600 text-white font-bold rounded-xl shadow-lg shadow-indigo-500/30 hover:bg-indigo-500 transition-all hover:scale-105">
+        + Reportar Mascota
+      </button>
+    </div>
+  </div>
+
+  <div *ngIf="loading" class="text-center py-20 text-slate-500 animate-pulse">⏳ Buscando mascotas...</div>
+  <div *ngIf="error" class="text-center py-20 text-red-400 font-bold bg-red-500/10 rounded-xl">{{ error }}</div>
+
+  <div *ngIf="!loading && mascotas.length === 0" class="text-center py-20 text-slate-500">
+    No hay mascotas perdidas reportadas actualmente.
+  </div>
+
+  <div *ngIf="!loading && !error" class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    
+    <div *ngFor="let pet of mascotas" [routerLink]="['/mascota', pet.id]" 
+         class="group bg-slate-900/50 rounded-2xl border border-white/10 overflow-hidden hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all cursor-pointer">
+      
+      <div class="aspect-4/3 bg-slate-800 relative overflow-hidden">
+        <img *ngIf="pet.fotos?.length > 0" [src]="getFotoSegura(pet.fotos[0])" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500">
+        <div *ngIf="!pet.fotos?.length" class="w-full h-full flex items-center justify-center text-4xl text-slate-600">🐾</div>
+        
+        <span [class]="getEstadoClass(pet.estado) + ' absolute top-3 right-3 shadow-lg backdrop-blur-md'">
+          {{ pet.estado === 'PERDIDO_PROPIO' ? 'Perdido' : 'Visto' }}
+        </span>
+      </div>
+
+      <div class="p-5">
+        <h3 class="font-bold text-xl text-white truncate mb-1">{{ pet.nombre }}</h3>
+        <p class="text-sm text-slate-400 mb-3 flex items-center gap-1">
+          📍 {{ pet.ubicacion?.barrio || 'Sin ubicación' }}
+        </p>
+        
+        <p class="text-sm text-slate-500 line-clamp-2 h-10 mb-4">{{ pet.descripcion }}</p>
+        
+        <div class="pt-4 border-t border-white/5 flex justify-between items-center">
+          <span class="text-xs text-slate-500 font-mono">{{ pet.fechaPublicacion | date:'dd/MM/yyyy' }}</span>
+          <span class="text-indigo-400 text-sm font-medium group-hover:text-indigo-300 transition-colors">Ver detalle →</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>

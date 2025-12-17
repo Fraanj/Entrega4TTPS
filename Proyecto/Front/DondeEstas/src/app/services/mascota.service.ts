@@ -26,4 +26,8 @@ export class MascotaService {
   getMascotasPerdidas(): Observable<Mascota[]> {
     return this.http.get<Mascota[]>(`${this.apiUrl}/perdidas`);
   }
+
+  getMascotas(): Observable<Mascota[]> {
+    return this.http.get<Mascota[]>(`${this.apiUrl}/obtenerTodas`);
+  }
 }
