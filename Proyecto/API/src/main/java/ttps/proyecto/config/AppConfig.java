@@ -27,9 +27,9 @@ import java.util.Properties;
  *  - Habilitar y configurar el manejo de transacciones
  *  - Escanear los paquetes de servicios, repositorios, etc.
  */
-@Configuration // Indica que esta clase define beans gestionados por Spring
-@EnableTransactionManagement // Habilita el manejo automático de transacciones (con @Transactional)
-@ComponentScan(basePackages = "ttps.proyecto") // Spring buscará componentes en este paquete (DAO, servicios, etc.)
+@Configuration
+@EnableTransactionManagement
+@ComponentScan(basePackages = {"ttps.proyecto", "ttps.proyecto.security"}) // Añadir paquete security
 @EnableJpaRepositories(basePackages = "ttps.proyecto.repositories")
 public class AppConfig {
 
