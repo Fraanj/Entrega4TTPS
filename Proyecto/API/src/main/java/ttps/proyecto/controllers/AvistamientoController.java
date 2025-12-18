@@ -3,6 +3,7 @@ package ttps.proyecto.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import jakarta.validation.Valid;
@@ -20,6 +21,7 @@ public class AvistamientoController {
     private AvistamientoService avistamientoService;
 
     @PostMapping
+    @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> crear(@Valid @RequestBody AvistamientoDto dto, @RequestParam Long reportadorId) {
         try {
             AvistamientoDto avistamiento = avistamientoService.crear(dto, reportadorId);

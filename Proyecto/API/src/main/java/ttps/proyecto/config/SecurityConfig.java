@@ -38,14 +38,11 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Rutas públicas - USAR AntPathRequestMatcher
                         .requestMatchers(new AntPathRequestMatcher("/api/auth/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/avistamientos/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/mascotas/**")).permitAll()
 
-                        // Rutas solo para ADMINISTRADOR
                         .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMINISTRADOR")
                         .requestMatchers(new AntPathRequestMatcher("/api/usuarios/**")).hasRole("ADMINISTRADOR")
-
-                        // Rutas para USUARIO o ADMINISTRADOR
-                        .requestMatchers(new AntPathRequestMatcher("/api/mascotas/**")).hasAnyRole("USUARIO", "ADMINISTRADOR")
-                        .requestMatchers(new AntPathRequestMatcher("/api/avistamientos/**")).hasAnyRole("USUARIO", "ADMINISTRADOR")
                         .requestMatchers(new AntPathRequestMatcher("/api/perfil/**")).authenticated()
 
                         // Cualquier otra ruta requiere autenticación

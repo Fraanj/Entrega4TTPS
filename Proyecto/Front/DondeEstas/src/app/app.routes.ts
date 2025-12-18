@@ -11,27 +11,26 @@ import { AuthGuard } from './guards/auth.guard';
 export const routes: Routes = [
   { 
     path: '', 
-    component: MainLayout, // 👈 Todas las rutas usan el layout
+    component: MainLayout,
     children: [
       { path: '', redirectTo: 'home', pathMatch: 'full' },
       { path: 'home', component: HomeComponent },
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       
-      // Rutas protegidas
+      // 🎯 Rutas de mascotas
       { 
         path: 'mascotas', 
         component: MascotaListComponent
       },
       { 
-        path: 'mascotas/nueva', 
+        path: 'mascotas/nueva',  // 👈 Esta es la que falta
         component: MascotaFormComponent,
         canActivate: [AuthGuard]
       },
       { 
         path: 'mascotas/:id', 
-        component: MascotaDetailComponent,
-        canActivate: [AuthGuard]
+        component: MascotaDetailComponent
       },
       { 
         path: 'mascotas/:id/editar', 

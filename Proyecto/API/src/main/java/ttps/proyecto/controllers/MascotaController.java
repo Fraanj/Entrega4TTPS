@@ -3,6 +3,7 @@ package ttps.proyecto.controllers;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ttps.proyecto.dto.MascotaDto;
 import ttps.proyecto.services.MascotaService;
@@ -18,6 +19,7 @@ public class MascotaController {
     private MascotaService mascotaService;
 
     @PostMapping
+    @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> crear(@RequestBody MascotaDto dto, @RequestParam Long usuarioId) {
         try {
             MascotaDto mascota = mascotaService.crear(dto, usuarioId);
@@ -56,6 +58,7 @@ public class MascotaController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody MascotaDto dto) {
         try {
             MascotaDto mascota = mascotaService.actualizar(id, dto);
@@ -66,6 +69,7 @@ public class MascotaController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> eliminar(@PathVariable Long id) {
         try {
             mascotaService.eliminar(id);
