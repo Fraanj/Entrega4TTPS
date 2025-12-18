@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { RouterOutlet, RouterLink, RouterLinkActive } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { AuthService } from '../../services/auth.service';
+import { ToastComponent } from '../../components/toast/toast.component'; // 👈 AGREGAR
 
 @Component({
   selector: 'app-main-layout',
@@ -10,13 +11,14 @@ import { AuthService } from '../../services/auth.service';
     RouterOutlet,
     RouterLink,
     RouterLinkActive,
-    CommonModule
+    CommonModule,
+    ToastComponent // 👈 AGREGAR
   ],
   templateUrl: './main-layout.html',
   styleUrl: './main-layout.css',
 })
 export class MainLayout {
-  isSidebarOpen = false; // 👈 Estado del menú móvil
+  isSidebarOpen = false;
 
   constructor(public authService: AuthService) {}
 

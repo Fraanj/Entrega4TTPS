@@ -1,0 +1,44 @@
+<div class="fixed top-4 right-4 z-[9999] flex flex-col gap-3 max-w-sm">
+  <div 
+    *ngFor="let toast of notificationService.toasts; trackBy: trackById"
+    [ngClass]="{
+      'border-green-500/30 bg-green-500/10': toast.type === 'success',
+      'border-red-500/30 bg-red-500/10': toast.type === 'error',
+      'border-yellow-500/30 bg-yellow-500/10': toast.type === 'warning',
+      'border-blue-500/30 bg-blue-500/10': toast.type === 'info'
+    }"
+    class="flex items-start gap-3 rounded-xl border backdrop-blur-xl p-4 shadow-2xl animate-slide-in">
+    
+    <!-- Icono -->
+    <div class="flex-shrink-0 text-2xl">
+      <ng-container [ngSwitch]="toast.type">
+        <span *ngSwitchCase="'success'">✅</span>
+        <span *ngSwitchCase="'error'">❌</span>
+        <span *ngSwitchCase="'warning'">⚠️</span>
+        <span *ngSwitchCase="'info'">ℹ️</span>
+      </ng-container>
+    </div>
+
+    <!-- Contenido -->
+    <div class="flex-1 min-w-0">
+      <h4 
+        [ngClass]="{
+          'text-green-300': toast.type === 'success',
+          'text-red-300': toast.type === 'error',
+          'text-yellow-300': toast.type === 'warning',
+          'text-blue-300': toast.type === 'info'
+        }"
+        class="font-bold text-sm">
+        {{ toast.title }}
+      </h4>
+      <p class="text-slate-300 text-sm mt-1">{{ toast.message }}</p>
+    </div>
+
+    <!-- Botón cerrar -->
+    <button 
+      (click)="close(toast)"
+      class="flex-shrink-0 text-slate-400 hover:text-white transition-colors">
+      ✕
+    </button>
+  </div>
+</div>

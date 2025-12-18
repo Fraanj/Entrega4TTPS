@@ -1,6 +1,8 @@
 import { Injectable } from '@angular/core';
 import { ApiService } from './fetch.api.service';
-import { UsuarioLogged, Usuario } from '../models/usuario.model';
+import { Usuario, UsuarioLogged } from '../models/usuario.model';
+import { NotificationService } from './notificacion.services';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -9,21 +11,34 @@ export class AuthService {
   private readonly TOKEN_KEY = 'accessToken';
   private readonly USER_KEY = 'usuario';
 
-  constructor(private apiService: ApiService) {}
+  constructor(
+    private apiService: ApiService,
+    private notificationService: NotificationService,
+    private router: Router
+  ) {}
 
   // Login
   async login(email: string, password: string): Promise<UsuarioLogged> {
-    const response = await this.apiService.post<UsuarioLogged>(
-      '/auth/login',
-      { email, password },
-      false // No requiere autenticación para login
-    );
-
-    // Guardar en localStorage
-    this.setToken(response.accessToken);
-    this.setUser(response.usuario);
-
-    return response;
+    try {
+      const response = await this.apiService.post<UsuarioLogged>(
+        '/auth/login',
+        { email, password },
+        false
+      );
+      
+      this.setToken(response.accessToken);
+      this.setUser(response.usuario);
+      
+      this.notificationService.success(
+        `Bienvenido ${response.usuario.nombre}!`,
+        'Inicio de sesión exitoso'
+      );
+      
+      return response;
+    } catch (error) {
+      // El interceptor ya mostró el error
+      throw error;
+    }
   }
 
   // Register
@@ -35,28 +50,40 @@ export class AuthService {
     telefono: string;
     ciudad: string;
   }): Promise<UsuarioLogged> {
-    const response = await this.apiService.post<UsuarioLogged>(
-      '/auth/register',
-      userData,
-      false // No requiere autenticación para registro
-    );
+    try {
+      const response = await this.apiService.post<UsuarioLogged>(
+        '/auth/register',
+        userData,
+        false
+      );
 
-    // Guardar en localStorage
-    this.setToken(response.accessToken);
-    this.setUser(response.usuario);
-
-    return response;
+      this.setToken(response.accessToken);
+      this.setUser(response.usuario);
+      
+      this.notificationService.success(
+        '¡Tu cuenta ha sido creada exitosamente!',
+        'Registro completado'
+      );
+      
+      return response;
+    } catch (error) {
+      // El interceptor ya mostró el error
+      throw error;
+    }
   }
 
   // Logout
   logout(): void {
     localStorage.removeItem(this.TOKEN_KEY);
     localStorage.removeItem(this.USER_KEY);
+    this.notificationService.info('Sesión cerrada correctamente', 'Hasta pronto');
+    this.router.navigate(['/login']);
   }
 
   // Verificar si está autenticado
   isAuthenticated(): boolean {
-    return !!this.getToken();
+    const token = this.getToken();
+    return !!token && !this.isTokenExpired();
   }
 
   // Obtener token
@@ -66,15 +93,22 @@ export class AuthService {
 
   // Obtener usuario actual
   getCurrentUser(): Usuario | null {
-    const userStr = localStorage.getItem(this.USER_KEY);
-    return userStr ? JSON.parse(userStr) : null;
+    const userJson = localStorage.getItem(this.USER_KEY);
+    return userJson ? JSON.parse(userJson) : null;
   }
 
   // Verificar si el token expiró
   isTokenExpired(): boolean {
-    // Implementar lógica de expiración si es necesario
-    // Por ahora retorna false
-    return false;
+    const token = this.getToken();
+    if (!token) return true;
+
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const exp = payload.exp * 1000;
+      return Date.now() >= exp;
+    } catch (error) {
+      return true;
+    }
   }
 
   // Métodos privados para gestionar localStorage
