@@ -1,61 +1,107 @@
 <div class="flex min-h-screen font-sans text-white bg-premium-dark">
 
-    <!-- SIDEBAR -->
-    <aside class="hidden w-64 flex-col border-r border-white/10 bg-white/5 p-6 backdrop-blur-xl md:flex">
-      <div class="mb-10 flex items-center gap-3 px-2">
-        <div class="text-2xl">🐶</div>
-        <span class="text-xl font-bold tracking-tight">¿Dónde estás?</span>
-      </div>
-  
-      <nav class="flex flex-1 flex-col gap-2">
-        <a
-            routerLink="/"
-            routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
-            [routerLinkActiveOptions]="{ exact: true }"
-            class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors
-                   [&:not(.router-link-active)]:hover:bg-white/10
-                   [&.router-link-active]:hover:bg-indigo-600">
-          <span>🏠</span> Dashboard
-        </a>
-  
-        <a routerLink="/mascotas"
+  <!-- BOTÓN HAMBURGUESA (siempre visible) -->
+  <button 
+    (click)="toggleSidebar()"
+    class="fixed top-4 left-4 z-50 flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors"
+    aria-label="Toggle menu">
+    <span class="text-2xl">{{ isSidebarOpen ? '✕' : '☰' }}</span>
+  </button>
+
+  <!-- OVERLAY (solo cuando está abierto) -->
+  <div 
+    *ngIf="isSidebarOpen"
+    (click)="closeSidebar()"
+    class="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm">
+  </div>
+
+  <!-- SIDEBAR -->
+  <aside 
+    [class.translate-x-0]="isSidebarOpen"
+    class="fixed inset-y-0 left-0 z-40 w-64 flex flex-col border-r border-white/10 bg-premium-dark p-6 backdrop-blur-xl transition-transform duration-300 ease-in-out -translate-x-full">
+    
+    <div class="mb-10 flex items-center gap-3 px-2 mt-16">
+      <div class="text-2xl">🐶</div>
+      <span class="text-xl font-bold tracking-tight">¿Dónde estás?</span>
+    </div>
+
+    <nav class="flex flex-1 flex-col gap-2">
+      <a
+        (click)="closeSidebar()"
+        routerLink="/"
         routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
         [routerLinkActiveOptions]="{ exact: true }"
         class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors
                [&:not(.router-link-active)]:hover:bg-white/10
                [&.router-link-active]:hover:bg-indigo-600">
-          <span>🐾</span> Mascotas
-        </a>
-  
-        <a routerLink="/mapa"
-            routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
-            class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors hover:bg-white/10
-        [&.router-link-active]:hover:bg-indigo-600">
-          <span>🗺️</span> Mapa
-        </a>
-  
-        <a routerLink="/ranking"
+        <span>🏠</span> Dashboard
+      </a>
+
+      <a 
+        (click)="closeSidebar()"
+        routerLink="/mascotas"
+        routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+        [routerLinkActiveOptions]="{ exact: true }"
+        class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors
+               [&:not(.router-link-active)]:hover:bg-white/10
+               [&.router-link-active]:hover:bg-indigo-600">
+        <span>🐾</span> Mascotas
+      </a>
+
+      <a 
+        (click)="closeSidebar()"
+        routerLink="/mapa"
         routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
         class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors hover:bg-white/10
-      [&.router-link-active]:hover:bg-indigo-600">
-          <span>🏆</span> Ranking
-        </a>
-      </nav>
-  
-      <div class="mt-auto flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
-        <div class="flex h-10 w-10 items-center justify-center rounded-full bg-linear-to-tr from-indigo-500 to-purple-500 text-sm font-bold">
-          Yo
+               [&.router-link-active]:hover:bg-indigo-600">
+        <span>🗺️</span> Mapa
+      </a>
+
+      <a 
+        (click)="closeSidebar()"
+        routerLink="/ranking"
+        routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+        class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors hover:bg-white/10
+               [&.router-link-active]:hover:bg-indigo-600">
+        <span>🏆</span> Ranking
+      </a>
+    </nav>
+
+    <!-- ÁREA DE USUARIO/LOGIN -->
+    <div class="mt-auto">
+      <!-- Si NO hay sesión: Botón de Login -->
+      <a 
+        *ngIf="!authService.isAuthenticated()" 
+        (click)="closeSidebar()"
+        routerLink="/login"
+        class="flex items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-4 py-3 font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/50 hover:scale-105">
+        <span>🔑</span> Iniciar Sesión
+      </a>
+
+      <!-- Si HAY sesión: Info del usuario + logout -->
+      <div *ngIf="authService.isAuthenticated()" class="space-y-3">
+        <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
+          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-sm font-bold">
+            {{ (authService.getCurrentUser()?.nombre || 'U').charAt(0).toUpperCase() }}
+          </div>
+          <div class="flex flex-col flex-1">
+            <span class="text-sm font-bold truncate">{{ authService.getCurrentUser()?.nombre || 'Usuario' }}</span>
+            <span class="text-xs text-slate-400">Conectado</span>
+          </div>
         </div>
-        <div class="flex flex-col">
-          <span class="text-sm font-bold">Joaco</span>
-          <span class="text-xs text-slate-400">Usuario</span>
-        </div>
+        
+        <button 
+          (click)="logout(); closeSidebar()"
+          class="w-full flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-2 font-medium text-red-300 transition-all hover:bg-red-500/20 hover:border-red-500/50">
+          <span></span> Cerrar Sesión
+        </button>
       </div>
-    </aside>
-  
-    <!-- CONTENIDO DINÁMICO -->
-    <main class="flex-1 overflow-y-auto p-8">
-      <router-outlet></router-outlet>
-    </main>
-  
-  </div>  
+    </div>
+  </aside>
+
+  <!-- CONTENIDO DINÁMICO -->
+  <main class="flex-1 overflow-y-auto p-8 pt-20">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

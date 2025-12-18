@@ -1,0 +1,167 @@
+<div class="flex min-h-full items-center justify-center px-4 py-12">
+  <div class="w-full max-w-2xl">
+    
+    <!-- Card del Registro -->
+    <div class="rounded-2xl border border-white/10 bg-white/5 p-8 backdrop-blur-xl shadow-2xl">
+      
+      <!-- Header -->
+      <div class="mb-8 text-center">
+        <div class="mb-4 flex justify-center">
+          <div class="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-600 to-purple-600 text-3xl shadow-lg shadow-indigo-500/30">
+            🐾
+          </div>
+        </div>
+        <h2 class="text-2xl font-bold tracking-tight text-white">Crear Cuenta</h2>
+        <p class="mt-2 text-sm text-slate-400">Únete a la comunidad de ¿Dónde estás?</p>
+      </div>
+
+      <!-- Formulario -->
+      <form (ngSubmit)="onRegister()" class="space-y-6">
+        
+        <!-- Fila: Nombre y Apellido -->
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <!-- Nombre -->
+          <div>
+            <label for="nombre" class="mb-2 block text-sm font-medium text-slate-300">
+              Nombre <span class="text-red-400">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="nombre" 
+              [(ngModel)]="formData.nombre" 
+              name="nombre"
+              placeholder="Juan"
+              required
+              class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            />
+          </div>
+
+          <!-- Apellido -->
+          <div>
+            <label for="apellido" class="mb-2 block text-sm font-medium text-slate-300">
+              Apellido <span class="text-red-400">*</span>
+            </label>
+            <input 
+              type="text" 
+              id="apellido" 
+              [(ngModel)]="formData.apellido" 
+              name="apellido"
+              placeholder="Pérez"
+              required
+              class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            />
+          </div>
+        </div>
+
+        <!-- Email -->
+        <div>
+          <label for="email" class="mb-2 block text-sm font-medium text-slate-300">
+            Email <span class="text-red-400">*</span>
+          </label>
+          <input 
+            type="email" 
+            id="email" 
+            [(ngModel)]="formData.email" 
+            name="email"
+            placeholder="correo@ejemplo.com"
+            required
+            class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+          />
+        </div>
+
+        <!-- Contraseña -->
+        <div>
+          <label for="password" class="mb-2 block text-sm font-medium text-slate-300">
+            Contraseña <span class="text-red-400">*</span>
+          </label>
+          <input 
+            type="password" 
+            id="password" 
+            [(ngModel)]="formData.password" 
+            name="password"
+            placeholder="••••••••"
+            required
+            class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+          />
+          <p class="mt-2 text-xs text-slate-400">Mínimo 8 caracteres, incluye mayúsculas, minúsculas y números</p>
+        </div>
+
+        <!-- Fila: Teléfono y Ciudad -->
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <!-- Teléfono -->
+          <div>
+            <label for="telefono" class="mb-2 block text-sm font-medium text-slate-300">
+              Teléfono
+            </label>
+            <input 
+              type="tel" 
+              id="telefono" 
+              [(ngModel)]="formData.telefono" 
+              name="telefono"
+              placeholder="1234567890"
+              class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            />
+          </div>
+
+          <!-- Ciudad -->
+          <div>
+            <label for="ciudad" class="mb-2 block text-sm font-medium text-slate-300">
+              Ciudad
+            </label>
+            <select 
+              id="ciudad" 
+              [(ngModel)]="formData.ciudad" 
+              name="ciudad"
+              class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 [&>option]:bg-slate-800">
+              <option value="" class="text-slate-400">Seleccionar ciudad</option>
+              <option value="La Plata">La Plata</option>
+              <option value="Buenos Aires">Buenos Aires</option>
+              <option value="Córdoba">Córdoba</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Mensaje de error -->
+        <div 
+          *ngIf="errorMessage" 
+          class="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+          <span class="mr-2">⚠️</span>{{ errorMessage }}
+        </div>
+
+        <!-- Botón de envío -->
+        <button 
+          type="submit" 
+          [disabled]="isLoading"
+          class="w-full rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 px-6 py-3 font-bold text-white shadow-lg shadow-indigo-500/30 transition-all hover:shadow-xl hover:shadow-indigo-500/50 hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100">
+          <span *ngIf="!isLoading">📝 Crear Cuenta</span>
+          <span *ngIf="isLoading" class="flex items-center justify-center gap-2">
+            <svg class="h-5 w-5 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+            </svg>
+            Registrando...
+          </span>
+        </button>
+      </form>
+
+      <!-- Link de login -->
+      <div class="mt-6 text-center">
+        <p class="text-sm text-slate-400">
+          ¿Ya tienes cuenta? 
+          <a 
+            routerLink="/login" 
+            class="font-semibold text-indigo-400 transition-colors hover:text-indigo-300">
+            Inicia sesión aquí
+          </a>
+        </p>
+      </div>
+
+    </div>
+
+    <!-- Footer opcional -->
+    <p class="mt-6 text-center text-xs text-slate-500">
+      Al registrarte, aceptas nuestros términos y condiciones
+    </p>
+
+  </div>
+</div>
