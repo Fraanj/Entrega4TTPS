@@ -12,4 +12,6 @@ public interface MascotaRepository extends JpaRepository<Mascota, Long> {
     List<Mascota> findByEstado(EstadoMascota estado);
     List<Mascota> findByPublicadorId(Long publicadorId);
     List<Mascota> findByEstadoIn(List<EstadoMascota> estados);
+
+    List<EstadoMascota> Estado(EstadoMascota estado);
 }

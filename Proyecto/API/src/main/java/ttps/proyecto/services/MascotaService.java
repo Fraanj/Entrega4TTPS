@@ -150,7 +150,7 @@ public class MascotaService {
             .map(this::convertToDto)
             .collect(Collectors.toList());
     }
-
+    //Perdidas
     public List<MascotaDto> obtenerMascotasPerdidas() {
         List<EstadoMascota> estadosPerdidos = Arrays.asList(
             EstadoMascota.PERDIDO_PROPIO, 
@@ -160,7 +160,19 @@ public class MascotaService {
             .map(this::convertToDto)
             .collect(Collectors.toList());
     }
+    //recuperadas
+    public List<MascotaDto> obtenerMascotasRecuperadas() {
+        return mascotaRepository.findByEstadoIn(Arrays.asList(EstadoMascota.RECUPERADO)).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
 
+    //adoptadas
+    public List<MascotaDto> obtenerMascotasAdoptadas() {
+        return mascotaRepository.findByEstadoIn(Arrays.asList(EstadoMascota.ADOPTADO)).stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
     public List<MascotaDto> obtenerTodas() {
         return mascotaRepository.findAll().stream()
             .map(this::convertToDto)

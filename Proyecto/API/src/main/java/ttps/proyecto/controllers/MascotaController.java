@@ -51,6 +51,16 @@ public class MascotaController {
         List<MascotaDto> mascotas = mascotaService.obtenerMascotasPerdidas();
         return ResponseEntity.ok(mascotas);
     }
+    @GetMapping("/recuperadas")
+    public ResponseEntity<List<MascotaDto>> obtenerRecuperadas() {
+        List<MascotaDto> mascotas = mascotaService.obtenerMascotasRecuperadas();
+        return ResponseEntity.ok(mascotas);
+    }
+    @GetMapping("/adoptadas")
+    public  ResponseEntity<List<MascotaDto>> obtenerAdoptadas() {
+        List<MascotaDto> mascotas = mascotaService.obtenerMascotasAdoptadas();
+        return ResponseEntity.ok(mascotas);
+    }
 
     @GetMapping("/obtenerTodas")
     public ResponseEntity<List<MascotaDto>> obtenerTodas() {

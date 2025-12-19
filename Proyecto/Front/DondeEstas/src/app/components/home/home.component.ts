@@ -2,8 +2,9 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MascotaService } from '../../services/mascota.service';
-import { AuthService } from '../../services/auth.service'; // 👈 AGREGAR
+import { AuthService } from '../../services/auth.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
+import { forkJoin } from 'rxjs'; // 👈 AGREGAR para ejecutar múltiples requests en paralelo
 
 @Component({
   selector: 'app-home',
@@ -17,8 +18,8 @@ export class HomeComponent implements OnInit {
 
   estadisticas = {
     perdidas: 0, 
-    recuperadas: 1234,
-    adoptadas: 567
+    recuperadas: 0,
+    adoptadas: 0
   };
 
   mascotasRecientes: any[] = [];
@@ -26,7 +27,7 @@ export class HomeComponent implements OnInit {
 
   constructor(
     private mascotaService: MascotaService,
-    public authService: AuthService, // 👈 AGREGAR (public para usarlo en el template)
+    public authService: AuthService,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
   ) {}
@@ -35,7 +36,6 @@ export class HomeComponent implements OnInit {
     this.cargarMascotas();
   }
 
-  // Método helper para obtener el nombre
   get nombreUsuario(): string {
     const usuario = this.authService.getCurrentUser();
     return usuario?.nombre || 'Usuario';
@@ -43,16 +43,30 @@ export class HomeComponent implements OnInit {
 
   cargarMascotas() {
     this.loading = true;
-    this.errorMessage = ''; 
-    this.mascotaService.getMascotasPerdidas().subscribe({
+    this.errorMessage = '';
+
+    // 🚀 Ejecutar los 3 GET en paralelo
+    forkJoin({
+      perdidas: this.mascotaService.getMascotasPerdidas(),
+      recuperadas: this.mascotaService.getMascotasRecuperadas(),
+      adoptadas: this.mascotaService.getMascotasAdoptadas()
+    }).subscribe({
       next: (data) => {
-        this.mascotasRecientes = data;
-        this.estadisticas.perdidas = data.length; 
+        // Guardar las mascotas recientes (solo perdidas)
+        this.mascotasRecientes = data.perdidas;
+
+        // Actualizar estadísticas con los conteos
+        this.estadisticas.perdidas = data.perdidas.length;
+        this.estadisticas.recuperadas = data.recuperadas.length;
+        this.estadisticas.adoptadas = data.adoptadas.length;
+
         this.loading = false;
         this.cdr.detectChanges();
+
+        console.log('📊 Estadísticas cargadas:', this.estadisticas);
       },
       error: (err) => {
-        console.error('❌ ERROR DEL BACKEND:', err); 
+        console.error('❌ ERROR DEL BACKEND:', err);
         this.errorMessage = 'No se pudo conectar. Revisá la consola (F12).';
         this.loading = false;
         this.cdr.detectChanges();
