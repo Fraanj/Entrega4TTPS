@@ -4,7 +4,9 @@
     
     <header class="mb-10 flex flex-col justify-between gap-4 md:flex-row md:items-end">
       <div>
-        <h1 class="text-3xl font-bold text-white">Hola, Joaco 👋</h1>
+        <h1 class="text-4xl md:text-5xl font-bold tracking-tight mb-4 bg-gradient-to-r from-white to-slate-300 bg-clip-text text-transparent">
+          Hola, {{ authService.getCurrentUser()?.nombre }} {{ authService.getCurrentUser()?.apellido }} 👋
+        </h1>
         <p class="mt-1 text-slate-400">Vamos a encontrar a todos hoy.</p>
       </div>
       <button 

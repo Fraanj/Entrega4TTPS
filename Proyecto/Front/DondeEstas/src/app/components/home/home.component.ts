@@ -1,7 +1,8 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
-import { CommonModule } from '@angular/common'; // Incluye DatePipe y ngIf/ngFor
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MascotaService } from '../../services/mascota.service';
+import { AuthService } from '../../services/auth.service'; // 👈 AGREGAR
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 
 @Component({
@@ -14,18 +15,18 @@ import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 export class HomeComponent implements OnInit {
   errorMessage: string = '';
 
-  // Estadísticas (Perdidas es dinámico, el resto hardcodeado por ahora)
   estadisticas = {
     perdidas: 0, 
-    recuperadas: 1234, // Dato simulado
-    adoptadas: 567     // Dato simulado
+    recuperadas: 1234,
+    adoptadas: 567
   };
 
-  mascotasRecientes: any[] = []; // Array vacío esperando datos del back
-  loading = true; // Para mostrar un estado de carga opcional
+  mascotasRecientes: any[] = [];
+  loading = true;
 
   constructor(
     private mascotaService: MascotaService,
+    public authService: AuthService, // 👈 AGREGAR (public para usarlo en el template)
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
   ) {}
@@ -34,17 +35,19 @@ export class HomeComponent implements OnInit {
     this.cargarMascotas();
   }
 
+  // Método helper para obtener el nombre
+  get nombreUsuario(): string {
+    const usuario = this.authService.getCurrentUser();
+    return usuario?.nombre || 'Usuario';
+  }
+
   cargarMascotas() {
     this.loading = true;
     this.errorMessage = ''; 
-    // Llamamos al endpoint "obtenerPerdidas" que creamos en el Controller
     this.mascotaService.getMascotasPerdidas().subscribe({
       next: (data) => {
         this.mascotasRecientes = data;
-        
-        // Actualizamos el contador de perdidas con la cantidad real
         this.estadisticas.perdidas = data.length; 
-        
         this.loading = false;
         this.cdr.detectChanges();
       },
@@ -56,8 +59,6 @@ export class HomeComponent implements OnInit {
       }
     });
   }
-
-  // --- Helpers visuales ---
 
   getEstadoClasses(estado: string): string {
     const base = 'px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ';
@@ -76,18 +77,13 @@ export class HomeComponent implements OnInit {
   }
 
   getFotoSegura(base64: string): SafeUrl {
-    // Si viene nulo o vacío
     if (!base64) return '';
 
-    // A veces el backend manda el string "pelado" sin el prefijo data:image...
-    // Esto lo arregla automáticamente:
     let imagenData = base64;
     if (!imagenData.startsWith('data:image')) {
-        // Asumimos jpeg por defecto si falta, pero funciona para la mayoría
         imagenData = 'data:image/jpeg;base64,' + base64;
     }
 
-    // Le dice a Angular: "Confía en mí, esto no es un virus, es una foto"
     return this.sanitizer.bypassSecurityTrustUrl(imagenData);
   }
 
