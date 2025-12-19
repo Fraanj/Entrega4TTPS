@@ -7,6 +7,7 @@ import { MascotaListComponent } from './components/mascota/mascota-list/mascota-
 import { MascotaFormComponent } from './components/mascota/mascota-form/mascota-form';
 import { MascotaDetailComponent } from './components/mascota/mascota-detail/mascota-detail';
 import { AuthGuard } from './guards/auth.guard';
+import { ProfileComponent } from './components/user/profile/profile.component';
 
 export const routes: Routes = [
   { 
@@ -18,6 +19,12 @@ export const routes: Routes = [
       { path: 'login', component: LoginComponent },
       { path: 'register', component: RegisterComponent },
       
+
+      { 
+        path: 'perfil', 
+        component: ProfileComponent,
+        canActivate: [AuthGuard] // 👈 Solo usuarios logueados
+      },
       // 🎯 Rutas de mascotas
       { 
         path: 'mascotas', 

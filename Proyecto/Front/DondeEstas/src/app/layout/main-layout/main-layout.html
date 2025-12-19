@@ -80,15 +80,16 @@
 
       <!-- Si HAY sesión: Info del usuario + logout -->
       <div *ngIf="authService.isAuthenticated()" class="space-y-3">
-        <div class="flex items-center gap-3 rounded-xl border border-white/10 bg-white/5 p-3">
-          <div class="flex h-10 w-10 items-center justify-center rounded-full bg-gradient-to-tr from-indigo-500 to-purple-500 text-sm font-bold">
-            {{ (authService.getCurrentUser()?.nombre || 'U').charAt(0).toUpperCase() }}
-          </div>
-          <div class="flex flex-col flex-1">
-            <span class="text-sm font-bold truncate">{{ authService.getCurrentUser()?.nombre || 'Usuario' }}</span>
-            <span class="text-xs text-slate-400">Conectado</span>
-          </div>
-        </div>
+        <a 
+          *ngIf="authService.isAuthenticated()"
+          (click)="closeSidebar()"
+          routerLink="/perfil"
+          routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+          class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors
+                [&:not(.router-link-active)]:hover:bg-white/10
+                [&.router-link-active]:hover:bg-indigo-600">
+          <span>👤</span> Mi Perfil
+        </a>
         
         <button 
           (click)="logout(); closeSidebar()"
