@@ -3,8 +3,11 @@ package ttps.proyecto.controllers;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
 import ttps.proyecto.dto.RegisterRequest;
+import ttps.proyecto.dto.UpdateUserRequest;
 import ttps.proyecto.dto.UsuarioDto;
 import ttps.proyecto.services.UsuarioService;
 
@@ -27,7 +30,8 @@ public class UsuarioController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody RegisterRequest request) {
+    @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
+    public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
         try {
             UsuarioDto usuario = usuarioService.actualizarPerfil(id, request);
             return ResponseEntity.ok(usuario);

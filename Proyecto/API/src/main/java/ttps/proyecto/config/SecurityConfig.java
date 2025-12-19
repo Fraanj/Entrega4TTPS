@@ -42,8 +42,7 @@ public class SecurityConfig {
                         .requestMatchers(new AntPathRequestMatcher("/api/mascotas/**")).permitAll()
 
                         .requestMatchers(new AntPathRequestMatcher("/api/admin/**")).hasRole("ADMINISTRADOR")
-                        .requestMatchers(new AntPathRequestMatcher("/api/usuarios/**")).hasRole("ADMINISTRADOR")
-                        .requestMatchers(new AntPathRequestMatcher("/api/perfil/**")).authenticated()
+                        .requestMatchers(new AntPathRequestMatcher("/api/usuarios/**")).permitAll()
 
                         // Cualquier otra ruta requiere autenticación
                         .anyRequest().authenticated()

@@ -4,10 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import ttps.proyecto.dto.AuthResponse;
-import ttps.proyecto.dto.LoginRequest;
-import ttps.proyecto.dto.RegisterRequest;
-import ttps.proyecto.dto.UsuarioDto;
+import ttps.proyecto.dto.*;
 import ttps.proyecto.models.EstadoUsuario;
 import ttps.proyecto.models.Rol;
 import ttps.proyecto.models.Usuario;
@@ -86,7 +83,7 @@ public class UsuarioService {
 
         return new AuthResponse(token, dto);
     }
-    public UsuarioDto actualizarPerfil(Long id, RegisterRequest request) {
+    public UsuarioDto actualizarPerfil(Long id, UpdateUserRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
 
@@ -97,7 +94,7 @@ public class UsuarioService {
         
         // Solo actualizar password si se proporciona uno nuevo
         if (request.getPassword() != null && !request.getPassword().isEmpty()) {
-            usuario.setPassword(request.getPassword());
+            usuario.setPassword(passwordEncoder.encode(request.getPassword()));
         }
 
         Usuario updated = usuarioRepository.save(usuario);

@@ -22,6 +22,7 @@ public class MascotaController {
     @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> crear(@RequestBody MascotaDto dto, @RequestParam Long usuarioId) {
         try {
+
             MascotaDto mascota = mascotaService.crear(dto, usuarioId);
             return ResponseEntity.status(HttpStatus.CREATED).body(mascota);
         } catch (Exception e) {
