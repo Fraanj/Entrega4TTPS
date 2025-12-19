@@ -1,0 +1,263 @@
+<div class="min-h-screen bg-premium-dark p-6 md:p-8 font-sans text-white">
+  
+  <div class="max-w-4xl mx-auto">
+    
+    <!-- Header -->
+    <div class="mb-8 flex items-center justify-between">
+      <div class="flex items-center gap-4">
+        <button 
+          routerLink="/home" 
+          class="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white hover:bg-white/10 rounded-xl transition-colors">
+          ← Volver
+        </button>
+        <h1 class="text-3xl font-bold">Mi Perfil</h1>
+      </div>
+
+      <!-- Badge de modo edición -->
+      <span 
+        *ngIf="modoEdicion"
+        class="px-4 py-2 rounded-full bg-amber-500/20 text-amber-300 text-sm font-medium border border-amber-500/30">
+        Editando
+      </span>
+    </div>
+
+    <!-- Card Principal -->
+    <div class="rounded-2xl border border-white/10 bg-white/5 backdrop-blur-xl shadow-2xl overflow-hidden">
+      
+      <!-- Banner superior con avatar -->
+      <div class="relative h-32 bg-gradient-to-r from-indigo-600 to-purple-600">
+        <div class="absolute -bottom-16 left-8">
+          <div class="flex h-32 w-32 items-center justify-center rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-500 text-5xl font-bold shadow-2xl ring-4 ring-premium-dark">
+            {{ getIniciales() }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Información del usuario -->
+      <div class="p-8 pt-20">
+        
+        <!-- Nombre completo -->
+        <div class="mb-6">
+          <h2 class="text-3xl font-bold">
+            {{ usuario?.nombre }} {{ usuario?.apellido }}
+          </h2>
+          <p class="text-slate-400 mt-1">{{ usuario?.rolNombre || 'Usuario' }}</p>
+        </div>
+
+        <!-- MODO LECTURA -->
+        <div *ngIf="!modoEdicion" class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          
+          <!-- Email -->
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-indigo-500/20 text-indigo-400">
+                📧
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Email</p>
+                <p class="text-white font-medium">{{ usuario?.email }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Teléfono -->
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-green-500/20 text-green-400">
+                📱
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Teléfono</p>
+                <p class="text-white font-medium">{{ usuario?.telefono || 'No especificado' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Ciudad -->
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-purple-500/20 text-purple-400">
+                📍
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Ciudad</p>
+                <p class="text-white font-medium">{{ usuario?.ciudad }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Puntos -->
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-amber-500/20 text-amber-400">
+                ⭐
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Puntos</p>
+                <p class="text-white font-medium">{{ usuario?.puntos || 0 }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado -->
+          <div class="rounded-xl border border-white/10 bg-white/5 p-4">
+            <div class="flex items-center gap-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-lg bg-emerald-500/20 text-emerald-400">
+                ✓
+              </div>
+              <div>
+                <p class="text-xs text-slate-400 uppercase tracking-wide">Estado</p>
+                <p class="text-white font-medium">{{ usuario?.estadoNombre || 'Activo' }}</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- MODO EDICIÓN -->
+        <form *ngIf="modoEdicion" (ngSubmit)="guardarCambios()" class="space-y-6">
+          
+          <!-- Nombre y Apellido -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="nombre" class="mb-2 block text-sm font-medium text-slate-300">
+                Nombre <span class="text-red-400">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="nombre" 
+                [(ngModel)]="formData.nombre" 
+                name="nombre"
+                required
+                class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              />
+            </div>
+
+            <div>
+              <label for="apellido" class="mb-2 block text-sm font-medium text-slate-300">
+                Apellido <span class="text-red-400">*</span>
+              </label>
+              <input 
+                type="text" 
+                id="apellido" 
+                [(ngModel)]="formData.apellido" 
+                name="apellido"
+                required
+                class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              />
+            </div>
+          </div>
+
+          <!-- Teléfono y Ciudad -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label for="telefono" class="mb-2 block text-sm font-medium text-slate-300">
+                Teléfono
+              </label>
+              <input 
+                type="tel" 
+                id="telefono" 
+                [(ngModel)]="formData.telefono" 
+                name="telefono"
+                placeholder="1234567890"
+                class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+              />
+            </div>
+
+            <div>
+              <label for="ciudad" class="mb-2 block text-sm font-medium text-slate-300">
+                Ciudad
+              </label>
+              <select 
+                id="ciudad" 
+                [(ngModel)]="formData.ciudad" 
+                name="ciudad"
+                [disabled]="loadingCiudades"
+                class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed [&>option]:bg-slate-800">
+                
+                <option value="" class="text-slate-400">
+                  {{ loadingCiudades ? 'Cargando ciudades...' : 'Seleccionar ciudad' }}
+                </option>
+                
+                <option *ngFor="let ciudad of ciudades" [value]="ciudad.nombre" class="text-white">
+                  {{ ciudad.nombre }} ({{ ciudad.provincia.nombre }})
+                </option>
+              </select>
+            </div>
+          </div>
+
+          <!-- 🔐 Nueva Contraseña (OPCIONAL) -->
+          <div>
+            <label for="password" class="mb-2 block text-sm font-medium text-slate-300">
+              Nueva Contraseña (opcional)
+            </label>
+            <input 
+              type="password" 
+              id="password" 
+              [(ngModel)]="formData.password" 
+              name="password"
+              placeholder="••••••••"
+              autocomplete="new-password"
+              class="w-full rounded-xl border border-white/10 bg-white/5 px-4 py-3 text-white placeholder-slate-500 transition-all focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/50"
+            />
+            <p class="mt-2 text-xs text-slate-400">
+              Dejá este campo vacío si no querés cambiar tu contraseña. Mínimo 8 caracteres.
+            </p>
+          </div>
+
+          <!-- Datos no editables (info) -->
+          <div class="rounded-xl border border-blue-500/30 bg-blue-500/10 p-4">
+            <p class="text-sm text-blue-300">
+              ℹ️ <strong>Email, puntos y estado</strong> no pueden modificarse desde aquí.
+            </p>
+          </div>
+
+        </form>
+
+        <!-- Acciones -->
+        <div class="mt-8 flex flex-col sm:flex-row gap-4">
+          
+          <!-- Modo Lectura -->
+          <ng-container *ngIf="!modoEdicion">
+            <button 
+              (click)="activarModoEdicion()"
+              class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-6 py-3 font-medium text-indigo-300 transition-all hover:bg-indigo-500/20 hover:border-indigo-500/50">
+              <span></span> Editar perfil
+            </button>
+            
+            <button 
+              (click)="onLogout()"
+              class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-red-500/30 bg-red-500/10 px-6 py-3 font-medium text-red-300 transition-all hover:bg-red-500/20 hover:border-red-500/50">
+              <span></span> Cerrar sesión
+            </button>
+          </ng-container>
+
+          <!-- Modo Edición -->
+          <ng-container *ngIf="modoEdicion">
+            <button 
+              type="button"
+              (click)="cancelarEdicion()"
+              [disabled]="isLoading"
+              class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-slate-500/30 bg-slate-500/10 px-6 py-3 font-medium text-slate-300 transition-all hover:bg-slate-500/20 hover:border-slate-500/50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <span>✕</span> Cancelar
+            </button>
+            
+            <button 
+              (click)="guardarCambios()"
+              [disabled]="isLoading || loadingCiudades"
+              class="flex-1 flex items-center justify-center gap-2 rounded-xl border border-green-500/30 bg-green-500/10 px-6 py-3 font-medium text-green-300 transition-all hover:bg-green-500/20 hover:border-green-500/50 disabled:opacity-50 disabled:cursor-not-allowed">
+              <span *ngIf="!isLoading">💾</span>
+              <span *ngIf="isLoading">⏳</span>
+              {{ isLoading ? 'Guardando...' : 'Guardar cambios' }}
+            </button>
+          </ng-container>
+
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
