@@ -24,7 +24,7 @@
 
   <div *ngIf="!loading && !error" class="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
     
-    <div *ngFor="let pet of mascotas" [routerLink]="['/mascota', pet.id]" 
+    <div *ngFor="let pet of mascotas" [routerLink]="['/mascotas', pet.id]" 
          class="group bg-slate-900/50 rounded-2xl border border-white/10 overflow-hidden hover:border-indigo-500/50 hover:shadow-2xl hover:shadow-indigo-500/10 transition-all cursor-pointer">
       
       <div class="aspect-4/3 bg-slate-800 relative overflow-hidden">

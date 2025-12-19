@@ -8,7 +8,7 @@
         <p class="mt-1 text-slate-400">Vamos a encontrar a todos hoy.</p>
       </div>
       <button 
-        routerLink="/mascota/nuevo"
+        routerLink="/mascotas/nueva"
         class="flex items-center gap-2 rounded-xl bg-indigo-600 px-6 py-3 font-semibold text-white shadow-lg shadow-indigo-500/40 transition-all hover:scale-105 hover:bg-indigo-500 active:scale-95">
         <span>+</span> Reportar Mascota
       </button>
@@ -68,7 +68,7 @@
         <div *ngIf="!loading && mascotasRecientes.length > 0" class="flex flex-col gap-0">
           
           <div *ngFor="let pet of mascotasRecientes" 
-            [routerLink]="['/mascota', pet.id]"
+            [routerLink]="['/mascotas', pet.id]"
             class="group flex items-start gap-4 border-b border-white/5 py-4 last:border-0 hover:bg-white/5 transition-colors rounded-xl px-3 cursor-pointer">
             
             <div class="h-16 w-16 shrink-0 rounded-xl overflow-hidden bg-slate-800 relative border border-white/10 group-hover:border-indigo-500/50 transition-all shadow-sm mt-1">
