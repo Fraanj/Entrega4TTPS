@@ -10,5 +10,5 @@ export interface Mascota {
   ubicacion: Ubicacion;
   usuarioId?: number; 
   fecha?: string;
-  foto?: string;
+  fotos?: string[];
 }

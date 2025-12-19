@@ -1,9 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { Router, RouterModule } from '@angular/router';
+import { Router, ActivatedRoute, RouterModule } from '@angular/router';
 import { MascotaService } from '../../../services/mascota.service';
-import * as L from 'leaflet'; // Importamos Leaflet
+import * as L from 'leaflet'; // Importamos Leaflet 
 
 @Component({
   selector: 'app-mascota-form',
@@ -15,7 +15,10 @@ import * as L from 'leaflet'; // Importamos Leaflet
 export class MascotaFormComponent implements OnInit {
   mascotaForm: FormGroup;
   loading = false;
+  isEditing = false;
+  petId: number | null = null;
 
+  // MAPA
   private map: any;
   private marker: any;
   selectedLat: number | null = null;
@@ -38,7 +41,8 @@ export class MascotaFormComponent implements OnInit {
   constructor(
     private fb: FormBuilder,
     private mascotaService: MascotaService,
-    private router: Router
+    private router: Router,
+    private route: ActivatedRoute
   ) {
     this.mascotaForm = this.fb.group({
       nombre: ['', Validators.required],
@@ -51,6 +55,55 @@ export class MascotaFormComponent implements OnInit {
 
   ngOnInit(): void {
     setTimeout(() => this.initMap(), 100);
+
+    // Chequear si es edición
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.isEditing = true;
+      this.petId = +id;
+      this.cargarDatosEdicion(this.petId);
+    }
+  }
+
+  // --- MODO EDICIÓN ---
+  cargarDatosEdicion(id: number) {
+    this.loading = true;
+    this.mascotaService.getMascotaById(id).subscribe({
+      next: (pet) => {
+        // Llenar el formulario
+        this.mascotaForm.patchValue({
+          nombre: pet.nombre,
+          descripcion: pet.descripcion,
+          color: pet.color,
+          tamanioNombre: pet.tamanioNombre,
+          estado: pet.estado,
+        });
+        
+        // Cargar fotos
+        if (pet.fotos && pet.fotos.length > 0) {
+          // Aseguramos que tengan el prefijo base64 si les falta
+          this.fotosBase64 = pet.fotos.map((f: string) => 
+            f.startsWith('data:image') ? f : 'data:image/jpeg;base64,' + f
+          );
+        }
+        
+        // Cargar ubicación en el mapa
+        if (pet.ubicacion) {
+          this.selectedLat = pet.ubicacion.latitud;
+          this.selectedLng = pet.ubicacion.longitud;
+          
+          if (this.map && this.selectedLat && this.selectedLng) {
+             this.map.setView([this.selectedLat, this.selectedLng], 13);
+             this.setMarker(this.selectedLat, this.selectedLng);
+          }
+        }
+        this.loading = false;
+      },
+      error: () => {
+        this.showToast('Error cargando la mascota', 'error');
+        this.router.navigate(['/mis-mascotas']);
+      }
+    });
   }
 
   // Inicializa el mapa
@@ -125,7 +178,7 @@ export class MascotaFormComponent implements OnInit {
     this.loading = true;
     const formValue = this.mascotaForm.value;
 
-    const nuevaMascota = {
+    const mascotaData = {
       ...formValue,
       ubicacion: {
         latitud: this.selectedLat,
@@ -135,10 +188,18 @@ export class MascotaFormComponent implements OnInit {
       fotos: this.fotosBase64 // Mandamos el array completo
     };
 
-    this.mascotaService.crearMascota(nuevaMascota).subscribe({
+    // Si es edición, usar PUT; si es nuevo, usar POST
+    const request$ = this.isEditing && this.petId
+      ? this.mascotaService.editarMascota(this.petId, mascotaData)
+      : this.mascotaService.crearMascota(mascotaData);
+
+    request$.subscribe({
       next: () => {
-        this.showToast('¡Mascota publicada con éxito!', 'success');
-        setTimeout(() => this.router.navigate(['/']), 2000); // Esperar a leer el mensaje
+        this.showToast(
+          this.isEditing ? '¡Mascota actualizada!' : '¡Mascota publicada con éxito!',
+          'success'
+        );
+        setTimeout(() => this.router.navigate(['/mis-mascotas']), 2000);
       },
       error: (err) => {
         console.error(err);

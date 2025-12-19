@@ -107,6 +107,18 @@ public class UsuarioService {
         return convertToDto(usuario);
     }
 
+    public Long obtenerIdPorEmail(String email) {
+        Usuario usuario = usuarioRepository.findByEmail(email)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return usuario.getId();
+    }
+
+    public Rol obtenerRolPorId(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return usuario.getRol();
+    }
+
     private UsuarioDto convertToDto(Usuario usuario) {
         return new UsuarioDto(
             usuario.getId(),

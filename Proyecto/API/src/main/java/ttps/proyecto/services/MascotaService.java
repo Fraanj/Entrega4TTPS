@@ -211,4 +211,11 @@ public class MascotaService {
         
         return dto;
     }
+
+    public List<MascotaDto> obtenerMisMascotas(Long usuarioId) {
+        
+        return mascotaRepository.findByPublicadorId(usuarioId).stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+    }
 }

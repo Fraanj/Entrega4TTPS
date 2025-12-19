@@ -65,6 +65,19 @@
                [&.router-link-active]:hover:bg-indigo-600">
         <span>🏆</span> Ranking
       </a>
+
+      <div *ngIf="authService.isAuthenticated()" class="space-y-3">
+        <a 
+          (click)="closeSidebar()"
+          routerLink="/mis-mascotas"
+          routerLinkActive="bg-indigo-600 text-white shadow-lg shadow-indigo-500/30"
+          [routerLinkActiveOptions]="{ exact: true }"
+          class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors
+                [&:not(.router-link-active)]:hover:bg-white/10
+                [&.router-link-active]:hover:bg-indigo-600">
+          <span>🐾</span> Mis Mascotas
+        </a>
+      </div>
     </nav>
 
     <!-- ÁREA DE USUARIO/LOGIN -->
@@ -79,6 +92,7 @@
       </a>
 
       <!-- Si HAY sesión: Info del usuario + logout -->
+
       <div *ngIf="authService.isAuthenticated()" class="space-y-3">
         <a 
           *ngIf="authService.isAuthenticated()"

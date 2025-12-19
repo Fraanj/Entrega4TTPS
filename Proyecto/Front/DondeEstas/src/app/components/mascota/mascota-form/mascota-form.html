@@ -1,132 +1,128 @@
 <div class="flex min-h-screen items-center justify-center bg-premium-dark p-4 font-sans relative">
   
-    <div *ngIf="toastMessage" 
-         class="fixed top-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl transition-all animate-bounce-in"
-         [ngClass]="toastType === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'">
-      <span class="text-2xl">{{ toastType === 'success' ? '✅' : '⚠️' }}</span>
-      <span class="font-medium">{{ toastMessage }}</span>
-    </div>
-  
-    <div class="w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900/80 p-8 backdrop-blur-xl shadow-2xl">
-      
-      <div class="mb-8 flex items-center justify-between border-b border-white/10 pb-4">
-        <div>
-          <h2 class="text-2xl font-bold text-white">Reportar Mascota</h2>
-          <p class="text-sm text-slate-400">Completá los datos para ayudar a encontrarla</p>
-        </div>
-        <button routerLink="/" class="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-all">✕</button>
-      </div>
-  
-      <form [formGroup]="mascotaForm" (ngSubmit)="onSubmit()" class="space-y-6">
-        
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-          
-          <div class="space-y-1">
-            <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Nombre *</label>
-            <input formControlName="nombre" type="text" 
-              class="w-full rounded-lg border bg-slate-800/50 p-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 transition-all"
-              [ngClass]="isFieldInvalid('nombre') ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:border-indigo-500 focus:ring-indigo-500'"
-              placeholder="Ej: Rex">
-            
-            <div *ngIf="isFieldInvalid('nombre')" class="flex items-center gap-1 text-xs text-red-400 mt-1 animate-pulse">
-              <span>●</span> Requerido
-            </div>
-          </div>
-  
-          <div class="space-y-1">
-            <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Color *</label>
-            <input formControlName="color" type="text" 
-               class="w-full rounded-lg border bg-slate-800/50 p-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 transition-all"
-               [ngClass]="isFieldInvalid('color') ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:border-indigo-500 focus:ring-indigo-500'"
-               placeholder="Ej: Marrón con manchas">
-             <div *ngIf="isFieldInvalid('color')" class="flex items-center gap-1 text-xs text-red-400 mt-1 animate-pulse">
-              <span>●</span> Requerido
-            </div>
-          </div>
-  
-          <div class="space-y-1">
-            <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Tamaño</label>
-            <div class="relative">
-              <select formControlName="tamanioNombre" 
-                class="w-full appearance-none rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                <option value="CHICO">Chico</option>
-                <option value="MEDIANO">Mediano</option>
-                <option value="GRANDE">Grande</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">▼</div>
-            </div>
-          </div>
-  
-          <div class="space-y-1">
-            <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Estado</label>
-            <div class="relative">
-              <select formControlName="estado" 
-                class="w-full appearance-none rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
-                <option value="PERDIDO_PROPIO">Perdí mi mascota</option>
-                <option value="PERDIDO_AJENO">Vi una mascota perdida</option>
-              </select>
-              <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">▼</div>
-            </div>
-          </div>
-        </div>
-  
-        <div class="space-y-1">
-          <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Descripción *</label>
-          <textarea formControlName="descripcion" rows="3" 
-             class="w-full rounded-lg border bg-slate-800/50 p-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 transition-all"
-             [ngClass]="isFieldInvalid('descripcion') ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:border-indigo-500 focus:ring-indigo-500'"
-             placeholder="Detalles que ayuden a identificarla..."></textarea>
-           <div *ngIf="isFieldInvalid('descripcion')" class="flex items-center gap-1 text-xs text-red-400 mt-1 animate-pulse">
-              <span>●</span> Mínimo 10 caracteres
-            </div>
-        </div>
-  
-        <div class="space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
-          <div class="flex items-center justify-between">
-            <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Fotos ({{fotosBase64.length}}/{{MAX_FOTOS}})</label>
-            <span class="text-xs text-slate-500">Máx 2MB por foto</span>
-          </div>
-          
-          <div class="flex flex-wrap gap-4">
-            <label *ngIf="fotosBase64.length < MAX_FOTOS" 
-                   class="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-600 bg-slate-800/50 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
-              <span class="text-2xl text-slate-400 group-hover:text-indigo-400 transition-colors">+</span>
-              <span class="text-[10px] text-slate-500 group-hover:text-indigo-400 mt-1">Subir</span>
-              <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
-            </label>
-  
-            <div *ngFor="let foto of fotosBase64; let i = index" class="relative h-24 w-24 group animate-fade-in">
-              <img [src]="foto" class="h-full w-full rounded-lg object-cover border border-white/20 shadow-lg">
-              <button type="button" (click)="removeFoto(i)" 
-                      class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600 hover:scale-110 transition-all z-10">
-                ✕
-              </button>
-            </div>
-          </div>
-        </div>
-  
-        <div class="space-y-2">
-          <div class="flex justify-between items-end">
-            <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Ubicación *</label>
-            <span *ngIf="ubicacionError" class="text-xs font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded animate-pulse">
-              ⚠️ Marcá un punto en el mapa
-            </span>
-          </div>
-          
-          <div id="map" class="h-64 w-full rounded-xl border-2 shadow-inner transition-all overflow-hidden"
-               [ngClass]="ubicacionError ? 'border-red-500 ring-2 ring-red-500/20' : 'border-white/10 hover:border-indigo-500/50'">
-          </div>
-          <p class="text-xs text-slate-500 flex items-center gap-1">
-            <span class="text-indigo-400">ℹ️</span> Hacé click donde viste a la mascota.
-          </p>
-        </div>
-  
-        <button type="submit" [disabled]="loading"
-          class="w-full rounded-xl bg-indigo-600 py-4 font-bold text-white shadow-lg shadow-indigo-500/40 transition-all hover:bg-indigo-500 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
-          <span *ngIf="loading" class="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
-          {{ loading ? 'Publicando...' : 'Publicar Mascota' }}
-        </button>
-  
-      </form>
-    </div>
+  <div *ngIf="toastMessage" 
+       class="fixed top-6 right-6 z-50 flex items-center gap-3 px-6 py-4 rounded-xl shadow-2xl transition-all animate-bounce-in"
+       [ngClass]="toastType === 'success' ? 'bg-emerald-500 text-white' : 'bg-red-500 text-white'">
+    <span class="text-2xl">{{ toastType === 'success' ? '✅' : '⚠️' }}</span>
+    <span class="font-medium">{{ toastMessage }}</span>
   </div>
+
+  <div class="w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900/80 p-8 backdrop-blur-xl shadow-2xl">
+    
+    <div class="mb-8 flex items-center justify-between border-b border-white/10 pb-4">
+      <div>
+        <h2 class="text-2xl font-bold text-white">{{ isEditing ? 'Editar Mascota' : 'Reportar Mascota' }}</h2>
+        <p class="text-sm text-slate-400">
+          {{ isEditing ? 'Actualizá los datos de tu publicación' : 'Completá los datos para ayudar a encontrarla' }}
+        </p>
+      </div>
+      <button [routerLink]="isEditing ? '/mis-mascotas' : '/'" class="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-all">✕</button>
+    </div>
+
+    <form [formGroup]="mascotaForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        
+        <div class="space-y-1">
+          <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Nombre *</label>
+          <input formControlName="nombre" type="text" 
+            class="w-full rounded-lg border bg-slate-800/50 p-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 transition-all"
+            [ngClass]="isFieldInvalid('nombre') ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:border-indigo-500 focus:ring-indigo-500'">
+          <div *ngIf="isFieldInvalid('nombre')" class="flex items-center gap-1 text-xs text-red-400 mt-1 animate-pulse"><span>●</span> Requerido</div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Color *</label>
+          <input formControlName="color" type="text" 
+             class="w-full rounded-lg border bg-slate-800/50 p-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 transition-all"
+             [ngClass]="isFieldInvalid('color') ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:border-indigo-500 focus:ring-indigo-500'">
+           <div *ngIf="isFieldInvalid('color')" class="flex items-center gap-1 text-xs text-red-400 mt-1 animate-pulse"><span>●</span> Requerido</div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Tamaño</label>
+          <div class="relative">
+            <select formControlName="tamanioNombre" 
+              class="w-full appearance-none rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+              <option value="CHICO">Chico</option>
+              <option value="MEDIANO">Mediano</option>
+              <option value="GRANDE">Grande</option>
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">▼</div>
+          </div>
+        </div>
+
+        <div class="space-y-1">
+          <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Estado</label>
+          <div class="relative">
+            <select formControlName="estado" 
+              class="w-full appearance-none rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500 cursor-pointer">
+              
+              <option value="PERDIDO_PROPIO">Perdí mi mascota</option>
+              <option value="PERDIDO_AJENO">Vi una mascota perdida</option>
+              
+              <ng-container *ngIf="isEditing">
+                <option value="RECUPERADO" class="bg-emerald-900 text-emerald-100">✅ ¡Encontrado! (Recuperado)</option>
+                <option value="ADOPTADO" class="bg-blue-900 text-blue-100">🏠 Adoptado</option>
+              </ng-container>
+
+            </select>
+            <div class="pointer-events-none absolute inset-y-0 right-0 flex items-center px-3 text-white">▼</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-1">
+        <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Descripción *</label>
+        <textarea formControlName="descripcion" rows="3" 
+           class="w-full rounded-lg border bg-slate-800/50 p-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 transition-all"
+           [ngClass]="isFieldInvalid('descripcion') ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:border-indigo-500 focus:ring-indigo-500'"></textarea>
+         <div *ngIf="isFieldInvalid('descripcion')" class="flex items-center gap-1 text-xs text-red-400 mt-1 animate-pulse"><span>●</span> Mínimo 10 caracteres</div>
+      </div>
+
+      <div class="space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Fotos ({{fotosBase64.length}}/{{MAX_FOTOS}})</label>
+          <span class="text-xs text-slate-500">Máx 2MB por foto</span>
+        </div>
+        
+        <div class="flex flex-wrap gap-4">
+          <label *ngIf="fotosBase64.length < MAX_FOTOS" 
+                 class="flex h-24 w-24 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-600 bg-slate-800/50 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
+            <span class="text-2xl text-slate-400 group-hover:text-indigo-400 transition-colors">+</span>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+          </label>
+
+          <div *ngFor="let foto of fotosBase64; let i = index" class="relative h-24 w-24 group animate-fade-in">
+            <img [src]="foto" class="h-full w-full rounded-lg object-cover border border-white/20 shadow-lg">
+            <button type="button" (click)="removeFoto(i)" 
+                    class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600 hover:scale-110 transition-all z-10">
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="space-y-2">
+        <div class="flex justify-between items-end">
+          <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Ubicación *</label>
+          <span *ngIf="ubicacionError" class="text-xs font-bold text-red-400 bg-red-500/10 px-2 py-1 rounded animate-pulse">⚠️ Marcá un punto</span>
+        </div>
+        
+        <div id="map" class="h-64 w-full rounded-xl border-2 shadow-inner transition-all overflow-hidden"
+             [ngClass]="ubicacionError ? 'border-red-500 ring-2 ring-red-500/20' : 'border-white/10 hover:border-indigo-500/50'">
+        </div>
+        <p class="text-xs text-slate-500">
+          {{ isEditing ? 'Podés cambiar la ubicación haciendo click en el mapa.' : 'Hacé click donde viste a la mascota.' }}
+        </p>
+      </div>
+
+      <button type="submit" [disabled]="loading"
+        class="w-full rounded-xl bg-indigo-600 py-4 font-bold text-white shadow-lg shadow-indigo-500/40 transition-all hover:bg-indigo-500 hover:scale-[1.01] active:scale-[0.99] disabled:opacity-50 disabled:cursor-not-allowed flex justify-center items-center gap-2">
+        <span *ngIf="loading" class="h-5 w-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></span>
+        {{ loading ? 'Guardando...' : (isEditing ? 'Guardar Cambios' : 'Publicar Mascota') }}
+      </button>
+
+    </form>
+  </div>
+</div>

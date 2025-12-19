@@ -8,6 +8,7 @@ import { MascotaFormComponent } from './components/mascota/mascota-form/mascota-
 import { MascotaDetailComponent } from './components/mascota/mascota-detail/mascota-detail';
 import { AuthGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/user/profile/profile.component';
+import { MisMascotasComponent } from './components/mascota/mis-mascotas/mis-mascotas';
 
 export const routes: Routes = [
   { 
@@ -36,11 +37,16 @@ export const routes: Routes = [
         canActivate: [AuthGuard]
       },
       { 
+        path: 'mis-mascotas', 
+        component: MisMascotasComponent,
+        canActivate: [AuthGuard] 
+      },
+      { 
         path: 'mascotas/:id', 
         component: MascotaDetailComponent
       },
       { 
-        path: 'mascotas/:id/editar', 
+        path: 'mascotas/editar/:id', 
         component: MascotaFormComponent,
         canActivate: [AuthGuard]
       }

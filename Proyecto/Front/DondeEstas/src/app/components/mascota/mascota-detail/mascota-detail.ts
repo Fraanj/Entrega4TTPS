@@ -1,9 +1,10 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ActivatedRoute, RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { MascotaService } from '../../../services/mascota.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import * as L from 'leaflet'; // Para mostrar mapa estático
+import { AuthService } from '../../../services/auth.service';
 
 @Component({
   selector: 'app-mascota-detail',
@@ -16,10 +17,13 @@ export class MascotaDetailComponent implements OnInit {
   pet: any = null;
   loading = true;
   fotoSeleccionada: SafeUrl | null = null; // Para la galería
+  esMio = false;
 
   constructor(
     private route: ActivatedRoute,
+    private router: Router,
     private mascotaService: MascotaService,
+    private authService: AuthService,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
   ) {}
@@ -33,6 +37,13 @@ export class MascotaDetailComponent implements OnInit {
     this.mascotaService.getMascotaById(id).subscribe({
       next: (data) => {
         this.pet = data;
+
+        // Verificar dueño
+        const currentUser = this.authService.getCurrentUser();
+        if (currentUser && this.pet?.publicadorId === currentUser.id) {
+          this.esMio = true;
+        }
+
         if (this.pet.fotos?.length > 0) {
           this.fotoSeleccionada = this.getFotoSegura(this.pet.fotos[0]);
         }
@@ -47,6 +58,19 @@ export class MascotaDetailComponent implements OnInit {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  eliminarMascota() {
+    if (!this.pet?.id) return;
+    if (confirm('¿Estás seguro de que querés eliminar esta publicación?')) {
+      this.mascotaService.eliminarMascota(this.pet.id).subscribe({
+        next: () => {
+          alert('Publicación eliminada');
+          this.router.navigate(['/mascotas']);
+        },
+        error: () => alert('Error al eliminar')
+      });
+    }
   }
 
   getFotoSegura(base64: string): SafeUrl {
