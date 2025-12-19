@@ -28,9 +28,8 @@ public class Avistamiento {
     @JoinColumn(name = "ubicacion_id", referencedColumnName = "id")
     private Ubicacion ubicacion;
 
-    @OneToOne(cascade = CascadeType.ALL, orphanRemoval = true)
-    @JoinColumn(name = "foto_id", referencedColumnName = "id")
-    private Foto foto; // Foto opcional del avistamiento
+    @Column(columnDefinition = "LONGTEXT")
+    private String foto;
 
     // Constructor vacío
     public Avistamiento() {}
@@ -46,4 +45,6 @@ public class Avistamiento {
     public void setMascota(Mascota mascota) { this.mascota = mascota; }
     public Ubicacion getUbicacion() { return ubicacion; }
     public void setUbicacion(Ubicacion ubicacion) {this.ubicacion = ubicacion; }
+    public String getFoto() { return foto; }
+    public void setFoto(String foto) { this.foto = foto; }
 }
