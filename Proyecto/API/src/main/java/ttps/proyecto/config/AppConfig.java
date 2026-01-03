@@ -43,8 +43,8 @@ public class AppConfig {
         // Driver JDBC que usará Hibernate (para MySQL 8)
         dataSource.setDriverClassName("com.mysql.cj.jdbc.Driver");
         // URL de conexión a la base de datos
-        dataSource.setUrl("jdbc:mysql://localhost:3306/mibd?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
-        // Credenciales de acceso
+        dataSource.setUrl("jdbc:mysql://db:3306/mibd?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=UTC");
+	// Credenciales de acceso
         dataSource.setUsername("root");
         dataSource.setPassword("1234567!");
         return dataSource;
