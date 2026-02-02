@@ -1,13 +1,10 @@
 # -----------------------------
 # 🚀 LEVANTAR SERVICIOS
 # -----------------------------
-Dependencias: 
-	1. docker 
-	2. docker-compose
+
 # Levantar todos los servicios (DB + Backend + Frontend)
 docker compose up -d
-# Reiniciar Servicios Para ver cambios reflejados (Backend + Frontend)
-docker-compose restart
+
 # Levantar solo un servicio
 docker compose up -d frontend
 docker compose up -d backend
