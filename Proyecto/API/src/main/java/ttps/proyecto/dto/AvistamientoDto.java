@@ -13,10 +13,10 @@ public class AvistamientoDto {
     @NotNull(message = "La mascota es obligatoria")
     private Long mascotaId;
     private String mascotaNombre;
+    @NotNull(message = "El reportador es obligatorio")
     private Long reportadorId;
     private String reportadorNombre;
     private UbicacionDto ubicacion;
-    private String foto; // Base64
 
     public AvistamientoDto() {}
 
@@ -44,7 +44,4 @@ public class AvistamientoDto {
     
     public UbicacionDto getUbicacion() { return ubicacion; }
     public void setUbicacion(UbicacionDto ubicacion) { this.ubicacion = ubicacion; }
-
-    public String getFoto() { return foto; }
-    public void setFoto(String foto) { this.foto = foto; }
 }
