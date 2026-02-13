@@ -77,6 +77,16 @@
                 [&.router-link-active]:hover:bg-indigo-600">
           <span>🐾</span> Mis Mascotas
         </a>
+        <a 
+          *ngIf="authService.getCurrentUser()?.rolNombre === 'ADMINISTRADOR'"
+          (click)="closeSidebar()"
+          routerLink="/admin/usuarios"
+          routerLinkActive="bg-amber-600 text-white shadow-lg shadow-amber-500/30"
+          class="group flex items-center gap-3 rounded-xl px-4 py-3 font-medium text-slate-300 transition-colors
+                [&:not(.router-link-active)]:hover:bg-white/10
+                [&.router-link-active]:hover:bg-amber-600">
+          <span>⚙️</span> Administración
+        </a>
       </div>
     </nav>
 

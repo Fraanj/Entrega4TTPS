@@ -9,6 +9,10 @@
 ### Análisis de Implementación
 - **Estado de Implementación**: `ESTADO-IMPLEMENTACION.md` ⭐ **LEER PRIMERO**
 
+### Resúmenes de tareas (para aprender)
+- **Carpeta**: `tareas/` — Mini resúmenes por tarea con clases, métodos y cambios en formato .md
+- **Índice**: `tareas/README.md`
+
 ---
 
 ## 🎯 Resumen Rápido

@@ -167,4 +167,26 @@ public class UsuarioService {
 
         return ranking;
     }
+
+    public List<UsuarioDto> obtenerTodos() {
+        return usuarioRepository.findAll().stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+    }
+
+    public void cambiarEstado(Long id, String estadoNombre) {
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        EstadoUsuario estado = estadoRepository.findByNombre(estadoNombre)
+            .orElseThrow(() -> new RuntimeException("Estado no válido: " + estadoNombre));
+        usuario.setEstado(estado);
+        usuarioRepository.save(usuario);
+    }
+
+    public void eliminarUsuario(Long id) {
+        if (!usuarioRepository.existsById(id)) {
+            throw new RuntimeException("Usuario no encontrado");
+        }
+        usuarioRepository.deleteById(id);
+    }
 }

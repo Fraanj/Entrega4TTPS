@@ -1,0 +1,62 @@
+<div class="min-h-screen bg-premium-dark p-6 font-sans text-white">
+  <div class="max-w-6xl mx-auto">
+    
+    <div class="mb-8 flex items-center justify-between border-b border-white/10 pb-6">
+      <div>
+        <h1 class="text-3xl font-bold">⚙️ Gestión de Usuarios</h1>
+        <p class="text-slate-400 mt-1">Listado, cambio de estado y eliminación</p>
+      </div>
+      <a routerLink="/admin/publicaciones" class="px-4 py-2 rounded-lg border border-white/10 hover:bg-white/10 transition-colors">
+        Ver Publicaciones
+      </a>
+    </div>
+
+    <div *ngIf="loading" class="py-20 text-center text-slate-500 animate-pulse">Cargando usuarios...</div>
+    <div *ngIf="error" class="py-10 text-center text-red-400 bg-red-500/10 rounded-xl">{{ error }}</div>
+
+    <div *ngIf="!loading && !error" class="rounded-2xl border border-white/10 overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-white/5 border-b border-white/10">
+            <tr>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">ID</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">Nombre</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">Email</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">Rol</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">Estado</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of usuarios" class="border-b border-white/5 hover:bg-white/5 transition-colors">
+              <td class="px-6 py-4 font-mono text-slate-400">{{ u.id }}</td>
+              <td class="px-6 py-4 font-medium">{{ u.nombre }} {{ u.apellido }}</td>
+              <td class="px-6 py-4 text-slate-300">{{ u.email }}</td>
+              <td class="px-6 py-4">
+                <span [class]="u.rolNombre === 'ADMINISTRADOR' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-500/20 text-slate-300'" 
+                      class="px-2 py-1 rounded text-xs font-bold">{{ u.rolNombre }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <span [class]="u.estadoNombre === 'HABILITADO' ? 'text-emerald-400' : 'text-red-400'" class="font-medium">
+                  {{ u.estadoNombre }}
+                </span>
+              </td>
+              <td class="px-6 py-4 text-right space-x-2">
+                <button (click)="cambiarEstado(u)" [disabled]="accionandoId === u.id"
+                        class="px-3 py-1.5 rounded-lg text-sm font-medium border border-amber-500/50 text-amber-300 hover:bg-amber-500/20 disabled:opacity-50">
+                  {{ u.estadoNombre === 'HABILITADO' ? 'Deshabilitar' : 'Habilitar' }}
+                </button>
+                <button *ngIf="u.rolNombre !== 'ADMINISTRADOR'" (click)="eliminar(u)" [disabled]="accionandoId === u.id"
+                        class="px-3 py-1.5 rounded-lg text-sm font-medium border border-red-500/50 text-red-300 hover:bg-red-500/20 disabled:opacity-50">
+                  Eliminar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="usuarios.length === 0" class="py-12 text-center text-slate-500">No hay usuarios registrados.</div>
+    </div>
+
+  </div>
+</div>
