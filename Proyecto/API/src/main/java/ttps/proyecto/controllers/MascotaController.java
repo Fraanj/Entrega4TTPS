@@ -75,6 +75,15 @@ public class MascotaController {
         return ResponseEntity.ok(mascotas);
     }
 
+    @GetMapping("/buscar")
+    public ResponseEntity<List<MascotaDto>> buscar(
+            @RequestParam(required = false) String color,
+            @RequestParam(required = false) String tamanio,
+            @RequestParam(required = false) String estado) {
+        List<MascotaDto> mascotas = mascotaService.buscarConFiltros(color, tamanio, estado);
+        return ResponseEntity.ok(mascotas);
+    }
+
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody MascotaDto dto, Authentication authentication) {

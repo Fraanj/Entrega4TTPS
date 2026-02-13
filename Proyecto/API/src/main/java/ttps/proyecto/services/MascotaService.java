@@ -1,6 +1,7 @@
 package ttps.proyecto.services;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -16,7 +17,9 @@ import ttps.proyecto.repositories.MascotaRepository;
 import ttps.proyecto.repositories.TamanioMascotaRepository;
 import ttps.proyecto.repositories.UsuarioRepository;
 
+import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -215,6 +218,44 @@ public class MascotaService {
     public List<MascotaDto> obtenerMisMascotas(Long usuarioId) {
         
         return mascotaRepository.findByPublicadorId(usuarioId).stream()
+            .map(this::convertToDto)
+            .collect(Collectors.toList());
+    }
+
+    public List<MascotaDto> buscarConFiltros(String color, String tamanio, String estado) {
+        Specification<Mascota> spec = (root, query, criteriaBuilder) -> {
+            List<Predicate> predicates = new ArrayList<>();
+
+            // Filtro por color (case-insensitive, contiene)
+            if (color != null && !color.trim().isEmpty()) {
+                predicates.add(criteriaBuilder.like(
+                    criteriaBuilder.lower(root.get("color")), 
+                    "%" + color.toLowerCase() + "%"
+                ));
+            }
+
+            // Filtro por tamaño
+            if (tamanio != null && !tamanio.trim().isEmpty()) {
+                predicates.add(criteriaBuilder.equal(
+                    root.get("tamanio").get("nombre"), 
+                    tamanio.toUpperCase()
+                ));
+            }
+
+            // Filtro por estado
+            if (estado != null && !estado.trim().isEmpty()) {
+                try {
+                    EstadoMascota estadoEnum = EstadoMascota.valueOf(estado.toUpperCase());
+                    predicates.add(criteriaBuilder.equal(root.get("estado"), estadoEnum));
+                } catch (IllegalArgumentException e) {
+                    // Si el estado no es válido, ignorar este filtro
+                }
+            }
+
+            return criteriaBuilder.and(predicates.toArray(new Predicate[0]));
+        };
+
+        return mascotaRepository.findAll(spec).stream()
             .map(this::convertToDto)
             .collect(Collectors.toList());
     }

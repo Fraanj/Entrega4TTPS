@@ -8,10 +8,15 @@ import ttps.proyecto.dto.*;
 import ttps.proyecto.models.EstadoUsuario;
 import ttps.proyecto.models.Rol;
 import ttps.proyecto.models.Usuario;
+import ttps.proyecto.repositories.AvistamientoRepository;
 import ttps.proyecto.repositories.EstadoUsuarioRepository;
 import ttps.proyecto.repositories.RolRepository;
 import ttps.proyecto.repositories.UsuarioRepository;
 import ttps.proyecto.security.JwtUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -25,11 +30,15 @@ public class UsuarioService {
     
     @Autowired
     private EstadoUsuarioRepository estadoRepository;
+    
     @Autowired
     private PasswordEncoder passwordEncoder;
 
     @Autowired
     private JwtUtil jwtUtil;
+
+    @Autowired
+    private AvistamientoRepository avistamientoRepository;
 
     public AuthResponse registrar(RegisterRequest request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
@@ -131,5 +140,31 @@ public class UsuarioService {
             usuario.getRol().getNombre(),
             usuario.getEstado().getNombre()
         );
+    }
+
+    public List<UsuarioRankingDto> obtenerRanking(int limit) {
+        List<Object[]> resultados = avistamientoRepository.findTopReportadores();
+        List<UsuarioRankingDto> ranking = new ArrayList<>();
+
+        int count = 0;
+        for (Object[] resultado : resultados) {
+            if (count >= limit) break;
+            
+            Long usuarioId = (Long) resultado[0];
+            Long cantidadReportes = (Long) resultado[1];
+            
+            Usuario usuario = usuarioRepository.findById(usuarioId).orElse(null);
+            if (usuario != null) {
+                ranking.add(new UsuarioRankingDto(
+                    usuario.getId(),
+                    usuario.getNombre(),
+                    usuario.getApellido(),
+                    cantidadReportes
+                ));
+                count++;
+            }
+        }
+
+        return ranking;
     }
 }

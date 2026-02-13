@@ -2,9 +2,10 @@ import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MascotaService } from '../../services/mascota.service';
+import { UsuarioService, UsuarioRanking } from '../../services/usuario.service';
 import { AuthService } from '../../services/auth.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
-import { forkJoin } from 'rxjs'; // 👈 AGREGAR para ejecutar múltiples requests en paralelo
+import { forkJoin } from 'rxjs';
 
 @Component({
   selector: 'app-home',
@@ -23,10 +24,13 @@ export class HomeComponent implements OnInit {
   };
 
   mascotasRecientes: any[] = [];
+  ranking: UsuarioRanking[] = [];
   loading = true;
+  loadingRanking = true;
 
   constructor(
     private mascotaService: MascotaService,
+    private usuarioService: UsuarioService,
     public authService: AuthService,
     private cdr: ChangeDetectorRef,
     private sanitizer: DomSanitizer
@@ -34,6 +38,7 @@ export class HomeComponent implements OnInit {
 
   ngOnInit(): void {
     this.cargarMascotas();
+    this.cargarRanking();
   }
 
   get nombreUsuario(): string {
@@ -109,5 +114,21 @@ export class HomeComponent implements OnInit {
       'ADOPTADO': 'Adoptado'
     };
     return labels[estado] || estado;
+  }
+
+  cargarRanking() {
+    this.loadingRanking = true;
+    this.usuarioService.obtenerRanking(10).subscribe({
+      next: (data) => {
+        this.ranking = data;
+        this.loadingRanking = false;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        console.error('Error al cargar ranking:', err);
+        this.loadingRanking = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 }

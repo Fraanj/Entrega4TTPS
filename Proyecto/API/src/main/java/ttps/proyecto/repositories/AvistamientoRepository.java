@@ -20,4 +20,9 @@ public interface AvistamientoRepository extends JpaRepository<Avistamiento, Long
            "LEFT JOIN FETCH a.ubicacion " +
            "WHERE a.id = :id")
     Optional<Avistamiento> findByIdWithRelations(@Param("id") Long id);
+    
+    @Query("SELECT a.reportador.id, COUNT(a) FROM Avistamiento a " +
+           "GROUP BY a.reportador.id " +
+           "ORDER BY COUNT(a) DESC")
+    List<Object[]> findTopReportadores();
 }

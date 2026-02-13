@@ -9,7 +9,10 @@ import org.springframework.web.bind.annotation.*;
 import ttps.proyecto.dto.RegisterRequest;
 import ttps.proyecto.dto.UpdateUserRequest;
 import ttps.proyecto.dto.UsuarioDto;
+import ttps.proyecto.dto.UsuarioRankingDto;
 import ttps.proyecto.services.UsuarioService;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -38,6 +41,13 @@ public class UsuarioController {
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
         }
+    }
+
+    @GetMapping("/ranking")
+    public ResponseEntity<List<UsuarioRankingDto>> obtenerRanking(
+            @RequestParam(defaultValue = "10") int limit) {
+        List<UsuarioRankingDto> ranking = usuarioService.obtenerRanking(limit);
+        return ResponseEntity.ok(ranking);
     }
 
     static class ErrorResponse {

@@ -61,4 +61,17 @@ export class MascotaService {
   editarMascota(id: number, mascota: any): Observable<Mascota> {
     return from(this.api.put<Mascota>(`/mascotas/${id}`, mascota, true));
   }
+
+  // Buscar con filtros
+  buscarConFiltros(color: string, tamanio: string, estado: string): Observable<Mascota[]> {
+    const params = new URLSearchParams();
+    if (color) params.append('color', color);
+    if (tamanio) params.append('tamanio', tamanio);
+    if (estado) params.append('estado', estado);
+    
+    const queryString = params.toString();
+    const url = queryString ? `/mascotas/buscar?${queryString}` : '/mascotas/obtenerTodas';
+    
+    return from(this.api.get<Mascota[]>(url, false));
+  }
 }

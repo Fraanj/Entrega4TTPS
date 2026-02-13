@@ -126,15 +126,26 @@
 
         <div class="rounded-2xl border border-white/10 bg-white/5 p-6">
           <h3 class="mb-4 font-bold">Top Rescatistas 🏆</h3>
-          <ul class="space-y-3">
-            <li class="flex justify-between border-b border-white/5 pb-2 text-sm last:border-0">
-              <span>🥇 María G.</span> <span class="font-mono text-indigo-400">350 pts</span>
-            </li>
-            <li class="flex justify-between border-b border-white/5 pb-2 text-sm last:border-0">
-              <span>🥈 Carlos R.</span> <span class="font-mono text-indigo-400">210 pts</span>
-            </li>
-            <li class="flex justify-between border-b border-white/5 pb-2 text-sm last:border-0">
-              <span>🥉 Vos</span> <span class="font-mono text-amber-400">180 pts</span>
+          
+          <div *ngIf="loadingRanking" class="py-6 text-center text-slate-500 text-sm animate-pulse">
+            Cargando ranking...
+          </div>
+
+          <div *ngIf="!loadingRanking && ranking.length === 0" class="py-6 text-center text-slate-500 text-sm">
+            Aún no hay reportes de avistamientos
+          </div>
+
+          <ul *ngIf="!loadingRanking && ranking.length > 0" class="space-y-3">
+            <li *ngFor="let usuario of ranking; let i = index" 
+                class="flex justify-between items-center border-b border-white/5 pb-2 text-sm last:border-0">
+              <span class="flex items-center gap-2">
+                <span *ngIf="i === 0">🥇</span>
+                <span *ngIf="i === 1">🥈</span>
+                <span *ngIf="i === 2">🥉</span>
+                <span *ngIf="i > 2" class="text-slate-500">{{ i + 1 }}.</span>
+                <span class="truncate">{{ usuario.nombre }} {{ usuario.apellido.charAt(0) }}.</span>
+              </span>
+              <span class="font-mono text-indigo-400 shrink-0 ml-2">{{ usuario.cantidadReportes }} reportes</span>
             </li>
           </ul>
         </div>
