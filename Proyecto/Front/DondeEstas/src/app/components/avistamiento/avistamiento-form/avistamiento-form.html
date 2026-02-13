@@ -1,0 +1,100 @@
+<div class="flex min-h-screen items-center justify-center bg-premium-dark p-4 font-sans">
+  
+  <div class="w-full max-w-2xl rounded-2xl border border-white/10 bg-slate-900/80 p-8 backdrop-blur-xl shadow-2xl">
+    
+    <div class="mb-8 flex items-center justify-between border-b border-white/10 pb-4">
+      <div>
+        <h2 class="text-2xl font-bold text-white">🔍 Reportar Avistamiento</h2>
+        <p class="text-sm text-slate-400">
+          Viste a <span class="font-semibold text-indigo-400">{{ mascotaNombre || 'esta mascota' }}</span>? Ayudanos a encontrarla
+        </p>
+      </div>
+      <button type="button" (click)="cancelar()" class="rounded-full p-2 text-slate-400 hover:bg-white/10 hover:text-white transition-all">✕</button>
+    </div>
+
+    <form [formGroup]="avistamientoForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      
+      <!-- Comentario -->
+      <div class="space-y-1">
+        <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Comentario * <span class="text-xs font-normal text-slate-500">(mínimo 10 caracteres)</span></label>
+        <textarea formControlName="comentario" rows="3" 
+          placeholder="Ej: Vi a esta mascota cerca del parque, parecía asustada pero en buen estado..."
+          class="w-full rounded-lg border bg-slate-800/50 p-3 text-white placeholder-slate-600 focus:outline-none focus:ring-2 transition-all"
+          [ngClass]="avistamientoForm.get('comentario')?.invalid && avistamientoForm.get('comentario')?.touched ? 'border-red-500 focus:ring-red-500' : 'border-white/10 focus:border-indigo-500 focus:ring-indigo-500'"></textarea>
+        <div *ngIf="avistamientoForm.get('comentario')?.invalid && avistamientoForm.get('comentario')?.touched" 
+             class="flex items-center gap-1 text-xs text-red-400 mt-1 animate-pulse">
+          <span>●</span> El comentario debe tener al menos 10 caracteres
+        </div>
+      </div>
+
+      <!-- Descripción adicional (opcional) -->
+      <div class="space-y-1">
+        <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Descripción adicional <span class="text-xs font-normal text-slate-500">(opcional)</span></label>
+        <textarea formControlName="descripcion" rows="2" 
+          placeholder="Detalles adicionales sobre el avistamiento..."
+          class="w-full rounded-lg border border-white/10 bg-slate-800/50 p-3 text-white placeholder-slate-600 focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500"></textarea>
+      </div>
+
+      <!-- Foto -->
+      <div class="space-y-3 rounded-xl border border-white/10 bg-white/5 p-4">
+        <div class="flex items-center justify-between">
+          <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Foto del avistamiento <span class="text-xs font-normal text-slate-500">(opcional)</span></label>
+          <span class="text-xs text-slate-500">Máx 2MB</span>
+        </div>
+        
+        <div class="flex gap-4">
+          <label *ngIf="!fotoBase64" 
+                 class="flex h-32 w-32 cursor-pointer flex-col items-center justify-center rounded-lg border-2 border-dashed border-slate-600 bg-slate-800/50 hover:border-indigo-500 hover:bg-indigo-500/10 transition-all group">
+            <span class="text-3xl text-slate-400 group-hover:text-indigo-400 transition-colors">📷</span>
+            <span class="mt-2 text-xs text-slate-500">Agregar foto</span>
+            <input type="file" (change)="onFileSelected($event)" accept="image/*" class="hidden">
+          </label>
+
+          <div *ngIf="fotoBase64" class="relative h-32 w-32 group animate-fade-in">
+            <img [src]="fotoBase64" class="h-full w-full rounded-lg object-cover border border-white/20 shadow-lg">
+            <button type="button" (click)="eliminarFoto()" 
+                    class="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 text-white flex items-center justify-center shadow-md hover:bg-red-600 hover:scale-110 transition-all z-10">
+              ✕
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mapa -->
+      <div class="space-y-2">
+        <label class="text-xs font-bold uppercase tracking-wide text-slate-400">Ubicación del avistamiento *</label>
+        <p class="text-xs text-slate-500">Hacé click en el mapa para marcar dónde viste a la mascota</p>
+        
+        <div id="map" class="h-80 w-full rounded-lg border border-white/10 shadow-inner overflow-hidden"></div>
+        
+        <div *ngIf="ubicacionError" class="flex items-center gap-2 rounded-lg bg-red-500/20 border border-red-500/50 p-3 text-sm text-red-300 animate-pulse">
+          <span class="text-lg">⚠️</span>
+          <span>Debes seleccionar una ubicación en el mapa</span>
+        </div>
+
+        <div *ngIf="selectedLat && selectedLng" class="flex items-center gap-2 rounded-lg bg-emerald-500/20 border border-emerald-500/50 p-3 text-sm text-emerald-300">
+          <span class="text-lg">📍</span>
+          <span>Ubicación seleccionada: {{ selectedLat.toFixed(5) }}, {{ selectedLng.toFixed(5) }}</span>
+        </div>
+      </div>
+
+      <!-- Botones -->
+      <div class="flex gap-3 pt-4">
+        <button type="button" (click)="cancelar()" 
+                class="flex-1 rounded-lg border border-white/10 bg-slate-800 px-6 py-3 font-semibold text-white hover:bg-slate-700 transition-all">
+          Cancelar
+        </button>
+        <button type="submit" [disabled]="loading || avistamientoForm.invalid"
+                class="flex-1 rounded-lg bg-gradient-to-r from-indigo-500 to-purple-600 px-6 py-3 font-semibold text-white shadow-lg hover:shadow-indigo-500/50 disabled:opacity-50 disabled:cursor-not-allowed transition-all hover:scale-[1.02]">
+          <span *ngIf="!loading">🔍 Reportar Avistamiento</span>
+          <span *ngIf="loading" class="flex items-center justify-center gap-2">
+            <span class="animate-spin">⏳</span> Guardando...
+          </span>
+        </button>
+      </div>
+
+    </form>
+
+  </div>
+
+</div>

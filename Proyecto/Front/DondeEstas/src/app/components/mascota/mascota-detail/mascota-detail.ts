@@ -5,11 +5,12 @@ import { MascotaService } from '../../../services/mascota.service';
 import { DomSanitizer, SafeUrl } from '@angular/platform-browser';
 import * as L from 'leaflet'; // Para mostrar mapa estático
 import { AuthService } from '../../../services/auth.service';
+import { AvistamientoListComponent } from '../../avistamiento/avistamiento-list/avistamiento-list';
 
 @Component({
   selector: 'app-mascota-detail',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, AvistamientoListComponent],
   templateUrl: './mascota-detail.html',
   styleUrls: []
 })

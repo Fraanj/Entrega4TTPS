@@ -9,6 +9,7 @@ import { MascotaDetailComponent } from './components/mascota/mascota-detail/masc
 import { AuthGuard } from './guards/auth.guard';
 import { ProfileComponent } from './components/user/profile/profile.component';
 import { MisMascotasComponent } from './components/mascota/mis-mascotas/mis-mascotas';
+import { AvistamientoFormComponent } from './components/avistamiento/avistamiento-form/avistamiento-form';
 
 export const routes: Routes = [
   { 
@@ -48,6 +49,12 @@ export const routes: Routes = [
       { 
         path: 'mascotas/editar/:id', 
         component: MascotaFormComponent,
+        canActivate: [AuthGuard]
+      },
+      // 🎯 Rutas de avistamientos
+      { 
+        path: 'avistamiento/reportar/:mascotaId', 
+        component: AvistamientoFormComponent,
         canActivate: [AuthGuard]
       }
     ]
