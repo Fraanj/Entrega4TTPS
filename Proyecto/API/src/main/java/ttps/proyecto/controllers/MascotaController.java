@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ttps.proyecto.dto.MascotaDto;
+import ttps.proyecto.exceptions.ForbiddenException;
 import ttps.proyecto.services.MascotaService;
 import ttps.proyecto.services.UsuarioService;
 
@@ -27,24 +28,16 @@ public class MascotaController {
     @PostMapping
     @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> crear(@RequestBody MascotaDto dto, Authentication authentication) {
-        try {
-            String email = authentication.getName();
-            Long usuarioId = usuarioService.obtenerIdPorEmail(email);
-            MascotaDto mascota = mascotaService.crear(dto, usuarioId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(mascota);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        String email = authentication.getName();
+        Long usuarioId = usuarioService.obtenerIdPorEmail(email);
+        MascotaDto mascota = mascotaService.crear(dto, usuarioId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(mascota);
     }
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtener(@PathVariable Long id) {
-        try {
-            MascotaDto mascota = mascotaService.obtenerPorId(id);
-            return ResponseEntity.ok(mascota);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        MascotaDto mascota = mascotaService.obtenerPorId(id);
+        return ResponseEntity.ok(mascota);
     }
 
     @GetMapping("/usuario/{usuarioId}")
@@ -87,66 +80,39 @@ public class MascotaController {
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @RequestBody MascotaDto dto, Authentication authentication) {
-        try {
-            String email = authentication.getName();
-            Long usuarioId = usuarioService.obtenerIdPorEmail(email);
+        String email = authentication.getName();
+        Long usuarioId = usuarioService.obtenerIdPorEmail(email);
 
-            // Verificar que la mascota pertenece al usuario autenticado
-            MascotaDto mascotaExistente = mascotaService.obtenerPorId(id);
-            if (!mascotaExistente.getPublicadorId().equals(usuarioId) && (usuarioService.obtenerRolPorId(usuarioId).getNombre().equals("ADMINISTRADOR") == false)) {
-                return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                    .body(new ErrorResponse("No tienes permiso para modificar esta mascota"));
-            }
-
-            MascotaDto mascota = mascotaService.actualizar(id, dto);
-            return ResponseEntity.ok(mascota);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        MascotaDto mascotaExistente = mascotaService.obtenerPorId(id);
+        if (!mascotaExistente.getPublicadorId().equals(usuarioId) && !usuarioService.obtenerRolPorId(usuarioId).getNombre().equals("ADMINISTRADOR")) {
+            throw new ForbiddenException("No tienes permiso para modificar esta mascota");
         }
+
+        MascotaDto mascota = mascotaService.actualizar(id, dto);
+        return ResponseEntity.ok(mascota);
     }
 
     @GetMapping("/misMascotas")
     @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> obtenerMisMascotas(Authentication authentication) {
-        try {
-            String email = authentication.getName();
-            Long id = usuarioService.obtenerIdPorEmail(email);
-            List<MascotaDto> mascotas = mascotaService.obtenerMisMascotas(id);
-            return ResponseEntity.ok(mascotas);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        String email = authentication.getName();
+        Long id = usuarioService.obtenerIdPorEmail(email);
+        List<MascotaDto> mascotas = mascotaService.obtenerMisMascotas(id);
+        return ResponseEntity.ok(mascotas);
     }
 
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> eliminar(@PathVariable Long id, Authentication authentication) {
-        try {
-            String email = authentication.getName();
-            Long usuarioId = usuarioService.obtenerIdPorEmail(email);
+        String email = authentication.getName();
+        Long usuarioId = usuarioService.obtenerIdPorEmail(email);
 
-            // Verificar que la mascota pertenece al usuario autenticado
-            MascotaDto mascotaExistente = mascotaService.obtenerPorId(id);
-                if (!mascotaExistente.getPublicadorId().equals(usuarioId) && (usuarioService.obtenerRolPorId(usuarioId).getNombre().equals("ADMINISTRADOR") == false)) {
-                    return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                        .body(new ErrorResponse("No tienes permiso para eliminar esta mascota"));
-            }
-
-            mascotaService.eliminar(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
+        MascotaDto mascotaExistente = mascotaService.obtenerPorId(id);
+        if (!mascotaExistente.getPublicadorId().equals(usuarioId) && !usuarioService.obtenerRolPorId(usuarioId).getNombre().equals("ADMINISTRADOR")) {
+            throw new ForbiddenException("No tienes permiso para eliminar esta mascota");
         }
-    }
 
-    static class ErrorResponse {
-        private String message;
-        
-        public ErrorResponse(String message) {
-            this.message = message;
-        }
-        
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
+        mascotaService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }

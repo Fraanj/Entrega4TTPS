@@ -16,6 +16,8 @@ import ttps.proyecto.models.enums.EstadoMascota;
 import ttps.proyecto.repositories.MascotaRepository;
 import ttps.proyecto.repositories.TamanioMascotaRepository;
 import ttps.proyecto.repositories.UsuarioRepository;
+import ttps.proyecto.exceptions.BadRequestException;
+import ttps.proyecto.exceptions.ResourceNotFoundException;
 
 import jakarta.persistence.criteria.Predicate;
 import java.time.LocalDate;
@@ -43,10 +45,10 @@ public class MascotaService {
 
     public MascotaDto crear(MascotaDto dto, Long publicadorId) {
         Usuario publicador = usuarioRepository.findById(publicadorId)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         TamanioMascota tamanio = tamanioRepository.findByNombre(dto.getTamanioNombre())
-            .orElseThrow(() -> new RuntimeException("Tamaño no encontrado"));
+            .orElseThrow(() -> new BadRequestException("Tamaño no encontrado"));
 
         Mascota mascota = new Mascota();
         mascota.setNombre(dto.getNombre());
@@ -109,7 +111,7 @@ public class MascotaService {
 
     public MascotaDto actualizar(Long id, MascotaDto dto) {
         Mascota mascota = mascotaRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+            .orElseThrow(() -> new ResourceNotFoundException("Mascota no encontrada"));
 
         mascota.setNombre(dto.getNombre());
         mascota.setColor(dto.getColor());
@@ -118,7 +120,7 @@ public class MascotaService {
 
         if (dto.getTamanioNombre() != null) {
             TamanioMascota tamanio = tamanioRepository.findByNombre(dto.getTamanioNombre())
-                .orElseThrow(() -> new RuntimeException("Tamaño no encontrado"));
+                .orElseThrow(() -> new BadRequestException("Tamaño no encontrado"));
             mascota.setTamanio(tamanio);
         }
 
@@ -137,14 +139,14 @@ public class MascotaService {
 
     public void eliminar(Long id) {
         if (!mascotaRepository.existsById(id)) {
-            throw new RuntimeException("Mascota no encontrada");
+            throw new ResourceNotFoundException("Mascota no encontrada");
         }
         mascotaRepository.deleteById(id);
     }
 
     public MascotaDto obtenerPorId(Long id) {
         Mascota mascota = mascotaRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+            .orElseThrow(() -> new ResourceNotFoundException("Mascota no encontrada"));
         return convertToDto(mascota);
     }
 

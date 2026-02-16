@@ -12,6 +12,8 @@ import ttps.proyecto.models.Usuario;
 import ttps.proyecto.repositories.AvistamientoRepository;
 import ttps.proyecto.repositories.MascotaRepository;
 import ttps.proyecto.repositories.UsuarioRepository;
+import ttps.proyecto.exceptions.BadRequestException;
+import ttps.proyecto.exceptions.ResourceNotFoundException;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -32,18 +34,18 @@ public class AvistamientoService {
 
     public AvistamientoDto crear(AvistamientoDto dto, Long reportadorId) {
         if(dto.getComentario() == null || dto.getComentario().trim().isEmpty()) {
-            throw new RuntimeException("El comentario es obligatorio");
+            throw new BadRequestException("El comentario es obligatorio");
         }
                 
         if (dto.getMascotaId() == null) {
-            throw new RuntimeException("La mascota es obligatoria");
+            throw new BadRequestException("La mascota es obligatoria");
         }
 
         Usuario reportador = usuarioRepository.findById(reportadorId)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         Mascota mascota = mascotaRepository.findById(dto.getMascotaId())
-            .orElseThrow(() -> new RuntimeException("Mascota no encontrada"));
+            .orElseThrow(() -> new ResourceNotFoundException("Mascota no encontrada"));
 
         Avistamiento avistamiento = new Avistamiento();
         avistamiento.setFecha(dto.getFecha() != null ? dto.getFecha() : LocalDate.now());
@@ -77,7 +79,7 @@ public class AvistamientoService {
 
     public AvistamientoDto obtenerPorId(Long id) {
         Avistamiento avistamiento = avistamientoRepository.findByIdWithRelations(id)
-            .orElseThrow(() -> new RuntimeException("Avistamiento no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Avistamiento no encontrado"));
         return convertToDto(avistamiento);
     }
 

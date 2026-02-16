@@ -13,6 +13,9 @@ import ttps.proyecto.repositories.EstadoUsuarioRepository;
 import ttps.proyecto.repositories.RolRepository;
 import ttps.proyecto.repositories.UsuarioRepository;
 import ttps.proyecto.security.JwtUtil;
+import ttps.proyecto.exceptions.BadRequestException;
+import ttps.proyecto.exceptions.ResourceNotFoundException;
+import ttps.proyecto.exceptions.UnauthorizedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,7 +45,7 @@ public class UsuarioService {
 
     public AuthResponse registrar(RegisterRequest request) {
         if (usuarioRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("El email ya está registrado");
+            throw new BadRequestException("El email ya está registrado");
         }
 
         Rol rol = rolRepository.findByNombre("USUARIO")
@@ -75,10 +78,10 @@ public class UsuarioService {
 
     public AuthResponse login(LoginRequest request) {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
-                .orElseThrow(() -> new RuntimeException("Credenciales inválidas"));
+                .orElseThrow(() -> new UnauthorizedException("Credenciales inválidas"));
 
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
-            throw new RuntimeException("Credenciales inválidas");
+            throw new UnauthorizedException("Credenciales inválidas");
         }
 
         UsuarioDto dto = convertToDto(usuario);
@@ -94,7 +97,7 @@ public class UsuarioService {
     }
     public UsuarioDto actualizarPerfil(Long id, UpdateUserRequest request) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
 
         usuario.setNombre(request.getNombre());
         usuario.setApellido(request.getApellido());
@@ -112,19 +115,19 @@ public class UsuarioService {
 
     public UsuarioDto obtenerPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return convertToDto(usuario);
     }
 
     public Long obtenerIdPorEmail(String email) {
         Usuario usuario = usuarioRepository.findByEmail(email)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+                .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return usuario.getId();
     }
 
     public Rol obtenerRolPorId(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         return usuario.getRol();
     }
 
@@ -176,16 +179,16 @@ public class UsuarioService {
 
     public void cambiarEstado(Long id, String estadoNombre) {
         Usuario usuario = usuarioRepository.findById(id)
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
         EstadoUsuario estado = estadoRepository.findByNombre(estadoNombre)
-            .orElseThrow(() -> new RuntimeException("Estado no válido: " + estadoNombre));
+            .orElseThrow(() -> new BadRequestException("Estado no válido: " + estadoNombre));
         usuario.setEstado(estado);
         usuarioRepository.save(usuario);
     }
 
     public void eliminarUsuario(Long id) {
         if (!usuarioRepository.existsById(id)) {
-            throw new RuntimeException("Usuario no encontrado");
+            throw new ResourceNotFoundException("Usuario no encontrado");
         }
         usuarioRepository.deleteById(id);
     }

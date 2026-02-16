@@ -23,12 +23,8 @@ public class AvistamientoController {
     @PostMapping
     @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> crear(@Valid @RequestBody AvistamientoDto dto, @RequestParam Long reportadorId) {
-        try {
-            AvistamientoDto avistamiento = avistamientoService.crear(dto, reportadorId);
-            return ResponseEntity.status(HttpStatus.CREATED).body(avistamiento);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        AvistamientoDto avistamiento = avistamientoService.crear(dto, reportadorId);
+        return ResponseEntity.status(HttpStatus.CREATED).body(avistamiento);
     }
 
     @GetMapping
@@ -39,28 +35,13 @@ public class AvistamientoController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtener(@PathVariable Long id) {
-        try {
-            AvistamientoDto avistamiento = avistamientoService.obtenerPorId(id);
-            return ResponseEntity.ok(avistamiento);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        AvistamientoDto avistamiento = avistamientoService.obtenerPorId(id);
+        return ResponseEntity.ok(avistamiento);
     }
 
     @GetMapping("/mascota/{mascotaId}")
     public ResponseEntity<List<AvistamientoDto>> listarPorMascota(@PathVariable Long mascotaId) {
         List<AvistamientoDto> avistamientos = avistamientoService.listarPorMascota(mascotaId);
         return ResponseEntity.ok(avistamientos);
-    }
-
-    static class ErrorResponse {
-        private String message;
-        
-        public ErrorResponse(String message) {
-            this.message = message;
-        }
-        
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
     }
 }

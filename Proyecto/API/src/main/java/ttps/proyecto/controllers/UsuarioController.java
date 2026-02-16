@@ -24,23 +24,15 @@ public class UsuarioController {
 
     @GetMapping("/{id}")
     public ResponseEntity<?> obtener(@PathVariable Long id) {
-        try {
-            UsuarioDto usuario = usuarioService.obtenerPorId(id);
-            return ResponseEntity.ok(usuario);
-        } catch (Exception e) {
-            return ResponseEntity.notFound().build();
-        }
+        UsuarioDto usuario = usuarioService.obtenerPorId(id);
+        return ResponseEntity.ok(usuario);
     }
 
     @PutMapping("/{id}")
     @PreAuthorize("hasRole('USUARIO') or hasRole('ADMINISTRADOR')")
     public ResponseEntity<?> actualizar(@PathVariable Long id, @Valid @RequestBody UpdateUserRequest request) {
-        try {
-            UsuarioDto usuario = usuarioService.actualizarPerfil(id, request);
-            return ResponseEntity.ok(usuario);
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
-        }
+        UsuarioDto usuario = usuarioService.actualizarPerfil(id, request);
+        return ResponseEntity.ok(usuario);
     }
 
     @GetMapping("/ranking")
@@ -48,16 +40,5 @@ public class UsuarioController {
             @RequestParam(defaultValue = "10") int limit) {
         List<UsuarioRankingDto> ranking = usuarioService.obtenerRanking(limit);
         return ResponseEntity.ok(ranking);
-    }
-
-    static class ErrorResponse {
-        private String message;
-        
-        public ErrorResponse(String message) {
-            this.message = message;
-        }
-        
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
     }
 }

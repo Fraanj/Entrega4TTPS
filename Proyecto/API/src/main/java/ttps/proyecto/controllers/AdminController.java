@@ -1,12 +1,12 @@
 package ttps.proyecto.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import ttps.proyecto.dto.MascotaDto;
 import ttps.proyecto.dto.UsuarioDto;
+import ttps.proyecto.exceptions.BadRequestException;
 import ttps.proyecto.services.MascotaService;
 import ttps.proyecto.services.UsuarioService;
 
@@ -35,26 +35,18 @@ public class AdminController {
 
     @PutMapping("/usuarios/{id}/estado")
     public ResponseEntity<?> cambiarEstadoUsuario(@PathVariable Long id, @RequestBody Map<String, String> body) {
-        try {
-            String estado = body.get("estado");
-            if (estado == null || estado.isBlank()) {
-                return ResponseEntity.badRequest().body(new ErrorResponse("El campo 'estado' es requerido (HABILITADO o DESHABILITADO)"));
-            }
-            usuarioService.cambiarEstado(id, estado.trim().toUpperCase());
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            return ResponseEntity.badRequest().body(new ErrorResponse(e.getMessage()));
+        String estado = body != null ? body.get("estado") : null;
+        if (estado == null || estado.isBlank()) {
+            throw new BadRequestException("El campo 'estado' es requerido (HABILITADO o DESHABILITADO)");
         }
+        usuarioService.cambiarEstado(id, estado.trim().toUpperCase());
+        return ResponseEntity.ok().build();
     }
 
     @DeleteMapping("/usuarios/{id}")
     public ResponseEntity<?> eliminarUsuario(@PathVariable Long id) {
-        try {
-            usuarioService.eliminarUsuario(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
-        }
+        usuarioService.eliminarUsuario(id);
+        return ResponseEntity.noContent().build();
     }
 
     // --- Gestión de Publicaciones (Mascotas) ---
@@ -67,18 +59,7 @@ public class AdminController {
 
     @DeleteMapping("/mascotas/{id}")
     public ResponseEntity<?> eliminarMascota(@PathVariable Long id) {
-        try {
-            mascotaService.eliminar(id);
-            return ResponseEntity.noContent().build();
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(new ErrorResponse(e.getMessage()));
-        }
-    }
-
-    static class ErrorResponse {
-        private String message;
-        public ErrorResponse(String message) { this.message = message; }
-        public String getMessage() { return message; }
-        public void setMessage(String message) { this.message = message; }
+        mascotaService.eliminar(id);
+        return ResponseEntity.noContent().build();
     }
 }
