@@ -13,6 +13,7 @@ Esta carpeta contiene mini resúmenes de cada tarea del plan, con **cambios real
 | 1.3 | Ranking Real de Usuarios | [03-ranking-usuarios.md](./03-ranking-usuarios.md) | Top usuarios por cantidad de avistamientos reportados |
 | 1.4 | Panel de Administración | [04-panel-admin.md](./04-panel-admin.md) | Gestión de usuarios y publicaciones (admin) |
 | 2.1 | Manejo global de excepciones | [05-manejo-excepciones.md](./05-manejo-excepciones.md) | @ControllerAdvice, ErrorResponse, excepciones por código HTTP |
+| 2.2 | Bot de Telegram | [06-bot-telegram.md](./06-bot-telegram.md) | /start, /help, /perdida; flujo nombre → foto → barrio → crear mascota |
 
 ---
 

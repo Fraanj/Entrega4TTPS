@@ -176,14 +176,15 @@
   - Respuestas JSON estandarizadas para errores
 - **Nota**: Actualmente las excepciones se manejan con `RuntimeException` básicas
 
-#### 2. Bot de Telegram ❌
-- **Estado**: ❌ NO IMPLEMENTADO
-- **Faltante**:
-  - Dependencia de Telegram Bot API (TelegramBots Java Library)
-  - Servicio de bot con comandos (`/perdida`, `/start`, `/help`)
-  - Integración con el backend para crear mascotas
-  - Manejo de fotos y ubicaciones desde Telegram
-  - Conversación interactiva (nombre, foto, barrio)
+#### 2. Bot de Telegram ✅
+- **Estado**: ✅ IMPLEMENTADO
+- **Implementado**:
+  - Dependencia `org.telegram:telegrambots` 6.9.7.1
+  - Comandos `/start`, `/help`, `/perdida` con flujo conversacional (nombre → foto → barrio)
+  - Integración con `MascotaService.crear` para registrar mascotas reportadas
+  - Manejo de fotos (descarga y base64) y barrio como texto
+  - Estado por chat (`TelegramConversationData`, `ConversationState`), registro condicional por `TELEGRAM_BOT_TOKEN`
+- **Variables de entorno**: `TELEGRAM_BOT_TOKEN` (obligatorio para activar), `TELEGRAM_BOT_USERNAME`, `TELEGRAM_BOT_PUBLICADOR_ID`
 - **NO REQUERIDO** (grupo de 3): Suscripciones a mascotas para notificaciones
 
 #### 3. Completar funcionalidades del frontend ⚠️
@@ -226,11 +227,11 @@
 - Validaciones con Jakarta Validation
 
 #### ❌ Faltante:
-- Manejo global de excepciones (`@ControllerAdvice`)
-- Endpoints de búsqueda con filtros
-- Endpoints de administración (gestión usuarios/publicaciones)
-- Endpoint de ranking de usuarios
-- Bot de Telegram
+- ~~Manejo global de excepciones~~ ✅
+- ~~Endpoints de búsqueda con filtros~~ ✅
+- ~~Endpoints de administración~~ ✅
+- ~~Endpoint de ranking de usuarios~~ ✅
+- ~~Bot de Telegram~~ ✅
 - Sistema de notificaciones
 - Websockets para tiempo real
 
@@ -278,7 +279,7 @@
    - Implementar endpoints faltantes
 
 2. **ALTA PRIORIDAD**:
-   - Bot de Telegram básico (comando `/perdida`)
+   - ~~Bot de Telegram básico (comando `/perdida`)~~ ✅
    - Sistema de notificaciones
 
 3. **NO REQUERIDO** (grupo de 4, no aplica):
@@ -322,9 +323,9 @@
    - Implementar panel básico de admin
 
 2. **Mediano plazo** (para subir nota):
-   - Manejo global de excepciones
-   - Bot de Telegram básico
-   - Búsquedas con filtros
+   - ~~Manejo global de excepciones~~ ✅
+   - ~~Bot de Telegram básico~~ ✅
+   - ~~Búsquedas con filtros~~ ✅
 
 3. **Largo plazo** (para nota alta):
    - Sistema completo de notificaciones
@@ -333,4 +334,4 @@
 
 ---
 
-**Conclusión**: El proyecto tiene una base sólida con el Entregable 6 casi completo. Para subir la nota con el Entregable 7, se requiere implementar las funcionalidades faltantes, especialmente el bot de Telegram y el manejo global de excepciones.
+**Conclusión**: El proyecto tiene una base sólida con el Entregable 6 completo y el Entregable 7 avanzado (manejo global de excepciones y bot de Telegram implementados). Pendiente opcional: endpoints faltantes para el front y sistema de notificaciones.
