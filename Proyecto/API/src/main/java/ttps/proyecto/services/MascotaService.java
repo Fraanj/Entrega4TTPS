@@ -60,38 +60,14 @@ public class MascotaService {
         mascota.setTamanio(tamanio);
 
         // Lógica GeoRef (Requisito del TP)
-        if (dto.getUbicacion() != null) {
+        if (dto.getUbicacion() != null && dto.getUbicacion().getLatitud() != null && dto.getUbicacion().getLongitud() != null) {
             Ubicacion ubicacion = new Ubicacion();
             Double lat = dto.getUbicacion().getLatitud();
             Double lon = dto.getUbicacion().getLongitud();
-            
+
             ubicacion.setLatitud(lat);
             ubicacion.setLongitud(lon);
-
-            // LLAMADA A API EXTERNA
-            try {
-                String url = String.format("https://apis.datos.gob.ar/georef/api/ubicacion?lat=%s&lon=%s", lat, lon);
-                // Mapeamos la respuesta a un objeto auxiliar o un Map (por simplicidad usamos Map)
-                System.out.println("LLAMADA A GEOREF");
-                Map<String, Object> response = restTemplate.getForObject(url, Map.class);
-                System.out.println("FINALIZO LLAMADA A GEOREF");
-                
-                if (response != null && response.containsKey("ubicacion")) {
-                    Map<String, Object> ubiData = (Map<String, Object>) response.get("ubicacion");
-                    
-                    // Obtenemos municipio o departamento según corresponda
-                    Map<String, Object> municipio = (Map<String, Object>) ubiData.get("municipio");
-                    Map<String, Object> provincia = (Map<String, Object>) ubiData.get("provincia");
-                    
-                    String nombreBarrio = municipio.get("nombre") != null ? (String) municipio.get("nombre") : (String) provincia.get("nombre");
-                    ubicacion.setBarrio(nombreBarrio); // Guardamos el dato real obtenido de la API
-                } else {
-                    ubicacion.setBarrio("Desconocido");
-                }
-            } catch (Exception e) {
-                System.out.println("Error conectando con GeoRef: " + e.getMessage());
-                ubicacion.setBarrio("Ubicación Manual"); // Fallback
-            }
+            ubicacion.setBarrio(obtenerBarrioDesdeGeoref(lat, lon));
 
             mascota.setUltimaUbicacion(ubicacion);
         }
@@ -124,13 +100,17 @@ public class MascotaService {
             mascota.setTamanio(tamanio);
         }
 
-        if (dto.getUbicacion() != null) {
+        // Actualizar ubicación: llamar a Georef para resolver barrio (el frontend envía barrio vacío)
+        if (dto.getUbicacion() != null && dto.getUbicacion().getLatitud() != null && dto.getUbicacion().getLongitud() != null) {
+            Double lat = dto.getUbicacion().getLatitud();
+            Double lon = dto.getUbicacion().getLongitud();
+
             if (mascota.getUltimaUbicacion() == null) {
                 mascota.setUltimaUbicacion(new Ubicacion());
             }
-            mascota.getUltimaUbicacion().setBarrio(dto.getUbicacion().getBarrio());
-            mascota.getUltimaUbicacion().setLatitud(dto.getUbicacion().getLatitud());
-            mascota.getUltimaUbicacion().setLongitud(dto.getUbicacion().getLongitud());
+            mascota.getUltimaUbicacion().setLatitud(lat);
+            mascota.getUltimaUbicacion().setLongitud(lon);
+            mascota.getUltimaUbicacion().setBarrio(obtenerBarrioDesdeGeoref(lat, lon));
         }
 
         Mascota updated = mascotaRepository.save(mascota);
@@ -182,6 +162,31 @@ public class MascotaService {
         return mascotaRepository.findAll().stream()
             .map(this::convertToDto)
             .collect(Collectors.toList());
+    }
+
+    /**
+     * Obtiene el nombre del barrio/ciudad a partir de coordenadas usando la API Georef.
+     * Usado tanto en crear() como en actualizar() para resolver la ubicación.
+     */
+    private String obtenerBarrioDesdeGeoref(Double lat, Double lon) {
+        try {
+            String url = String.format("https://apis.datos.gob.ar/georef/api/ubicacion?lat=%s&lon=%s", lat, lon);
+            Map<String, Object> response = restTemplate.getForObject(url, Map.class);
+
+            if (response != null && response.containsKey("ubicacion")) {
+                Map<String, Object> ubiData = (Map<String, Object>) response.get("ubicacion");
+                Map<String, Object> municipio = (Map<String, Object>) ubiData.get("municipio");
+                Map<String, Object> provincia = (Map<String, Object>) ubiData.get("provincia");
+
+                String nombreBarrio = municipio != null && municipio.get("nombre") != null
+                        ? (String) municipio.get("nombre")
+                        : (provincia != null && provincia.get("nombre") != null ? (String) provincia.get("nombre") : "Desconocido");
+                return nombreBarrio;
+            }
+            return "Desconocido";
+        } catch (Exception e) {
+            return "Ubicación Manual";
+        }
     }
 
     private MascotaDto convertToDto(Mascota mascota) {

@@ -87,14 +87,14 @@ export class MascotaFormComponent implements OnInit {
           );
         }
         
-        // Cargar ubicación en el mapa
-        if (pet.ubicacion) {
+        // Cargar ubicación en el mapa (el mapa puede no existir aún; initMap la aplicará después)
+        if (pet.ubicacion?.latitud && pet.ubicacion?.longitud) {
           this.selectedLat = pet.ubicacion.latitud;
           this.selectedLng = pet.ubicacion.longitud;
-          
-          if (this.map && this.selectedLat && this.selectedLng) {
-             this.map.setView([this.selectedLat, this.selectedLng], 13);
-             this.setMarker(this.selectedLat, this.selectedLng);
+
+          if (this.map) {
+            this.map.setView([this.selectedLat, this.selectedLng], 13);
+            this.setMarker(this.selectedLat, this.selectedLng);
           }
         }
         this.loading = false;
@@ -108,11 +108,18 @@ export class MascotaFormComponent implements OnInit {
 
   // Inicializa el mapa
   private initMap(): void {
-    this.map = L.map('map').setView([this.defaultLat, this.defaultLng], 13);
+    const centerLat = this.selectedLat ?? this.defaultLat;
+    const centerLng = this.selectedLng ?? this.defaultLng;
+    this.map = L.map('map').setView([centerLat, centerLng], 13);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       attribution: '© OpenStreetMap contributors'
     }).addTo(this.map);
+
+    // Si ya tenemos ubicación cargada (modo edición), mostrar marcador
+    if (this.selectedLat != null && this.selectedLng != null) {
+      this.setMarker(this.selectedLat, this.selectedLng);
+    }
 
     // Evento click en el mapa
     this.map.on('click', (e: any) => {
