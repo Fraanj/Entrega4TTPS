@@ -17,6 +17,8 @@ export class MascotaFormComponent implements OnInit {
   loading = false;
   isEditing = false;
   petId: number | null = null;
+  /** Si la mascota está RECUPERADO o ADOPTADO, no se puede cambiar el estado (regla de negocio) */
+  estadoBloqueado = false;
 
   // MAPA
   private map: any;
@@ -78,7 +80,14 @@ export class MascotaFormComponent implements OnInit {
           tamanioNombre: pet.tamanioNombre,
           estado: pet.estado,
         });
-        
+
+        // Regla de negocio: RECUPERADO y ADOPTADO son estados finales, no se pueden cambiar
+        const estadosFinales = ['RECUPERADO', 'ADOPTADO'];
+        this.estadoBloqueado = estadosFinales.includes(pet.estado);
+        if (this.estadoBloqueado) {
+          this.mascotaForm.get('estado')?.disable();
+        }
+
         // Cargar fotos
         if (pet.fotos && pet.fotos.length > 0) {
           // Aseguramos que tengan el prefijo base64 si les falta
@@ -183,7 +192,7 @@ export class MascotaFormComponent implements OnInit {
     }
 
     this.loading = true;
-    const formValue = this.mascotaForm.value;
+    const formValue = this.mascotaForm.getRawValue(); // incluye campos disabled (ej. estado bloqueado)
 
     const mascotaData = {
       ...formValue,

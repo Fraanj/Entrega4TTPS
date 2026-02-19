@@ -14,6 +14,7 @@ import { AvistamientoFormComponent } from './components/avistamiento/avistamient
 import { AdminUsuariosComponent } from './components/admin/admin-usuarios/admin-usuarios';
 import { AdminPublicacionesComponent } from './components/admin/admin-publicaciones/admin-publicaciones';
 import { MapaComponent } from './components/mapa/mapa.component';
+import { RankingComponent } from './components/ranking/ranking.component';
 
 export const routes: Routes = [
   { 
@@ -39,6 +40,10 @@ export const routes: Routes = [
       { 
         path: 'mapa', 
         component: MapaComponent
+      },
+      { 
+        path: 'ranking', 
+        component: RankingComponent
       },
       { 
         path: 'mascotas/nueva',  // 👈 Esta es la que falta

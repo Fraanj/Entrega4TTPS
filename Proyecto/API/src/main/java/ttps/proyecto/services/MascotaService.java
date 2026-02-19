@@ -92,7 +92,11 @@ public class MascotaService {
         mascota.setNombre(dto.getNombre());
         mascota.setColor(dto.getColor());
         mascota.setDescripcion(dto.getDescripcion());
-        mascota.setEstado(dto.getEstado());
+
+        // Regla de negocio: RECUPERADO y ADOPTADO son estados finales, no se pueden cambiar
+        if (mascota.getEstado() != EstadoMascota.RECUPERADO && mascota.getEstado() != EstadoMascota.ADOPTADO) {
+            mascota.setEstado(dto.getEstado());
+        }
 
         if (dto.getTamanioNombre() != null) {
             TamanioMascota tamanio = tamanioRepository.findByNombre(dto.getTamanioNombre())
