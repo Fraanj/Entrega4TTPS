@@ -1,0 +1,32 @@
+<div class="min-h-screen bg-premium-dark p-6 font-sans text-white">
+  <div class="max-w-6xl mx-auto">
+    
+    <div class="mb-6 border-b border-white/10 pb-6">
+      <h1 class="text-3xl font-bold flex items-center gap-2">
+        <span>🗺️</span> Mapa de Mascotas Perdidas
+      </h1>
+      <p class="text-slate-400 mt-1">
+        Ubicaciones reportadas de mascotas en búsqueda
+      </p>
+    </div>
+
+    <div *ngIf="loading" class="flex justify-center py-20">
+      <div class="text-center">
+        <div class="animate-spin text-4xl mb-2">⏳</div>
+        <p class="text-slate-400">Cargando mapa...</p>
+      </div>
+    </div>
+
+    <div *ngIf="!loading" class="rounded-2xl border border-white/10 overflow-hidden bg-slate-900/30">
+      <div id="mapa-perdidas" class="h-[calc(100vh-280px)] min-h-[400px] w-full"></div>
+      <p class="text-xs text-slate-500 p-3 text-center">
+        {{ mascotas.length }} mascota(s) perdida(s) • Click en un marcador para ver detalles
+      </p>
+    </div>
+
+    <a routerLink="/mascotas" class="inline-flex items-center gap-2 mt-6 text-slate-400 hover:text-white transition-colors">
+      <span>←</span> Volver al listado de mascotas
+    </a>
+
+  </div>
+</div>

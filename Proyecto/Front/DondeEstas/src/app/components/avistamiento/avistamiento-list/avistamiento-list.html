@@ -31,7 +31,7 @@
   <!-- Lista de avistamientos -->
   <div *ngIf="!loading && !error && avistamientos.length > 0" class="space-y-3">
     
-    <div *ngFor="let avistamiento of avistamientos" 
+    <div *ngFor="let avistamiento of avistamientos; let i = index" 
          class="rounded-lg border border-white/10 bg-slate-800/50 p-4 hover:bg-slate-800/70 transition-all animate-fade-in">
       
       <div class="flex gap-4">
@@ -66,14 +66,14 @@
             {{ avistamiento.descripcion }}
           </p>
 
-          <!-- Coordenadas (colapsable) -->
-          <details *ngIf="avistamiento.ubicacion" class="mt-2">
+          <!-- Ubicación en mapa (colapsable) -->
+          <details *ngIf="avistamiento.ubicacion?.latitud && avistamiento.ubicacion?.longitud"
+                  (toggle)="onDetailsToggle($event, avistamiento, i)"
+                  class="mt-2">
             <summary class="text-xs text-indigo-400 cursor-pointer hover:text-indigo-300">
-              Ver coordenadas
+              Ver ubicación en mapa
             </summary>
-            <p class="text-xs text-slate-500 mt-1">
-              Lat: {{ avistamiento.ubicacion.latitud }}, Lng: {{ avistamiento.ubicacion.longitud }}
-            </p>
+            <div [id]="'mapa-av-' + i" class="h-64 w-full rounded-lg mt-2 border border-white/10 overflow-hidden bg-slate-900/50"></div>
           </details>
 
         </div>

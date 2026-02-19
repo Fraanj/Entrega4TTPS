@@ -13,6 +13,7 @@ import { MisMascotasComponent } from './components/mascota/mis-mascotas/mis-masc
 import { AvistamientoFormComponent } from './components/avistamiento/avistamiento-form/avistamiento-form';
 import { AdminUsuariosComponent } from './components/admin/admin-usuarios/admin-usuarios';
 import { AdminPublicacionesComponent } from './components/admin/admin-publicaciones/admin-publicaciones';
+import { MapaComponent } from './components/mapa/mapa.component';
 
 export const routes: Routes = [
   { 
@@ -34,6 +35,10 @@ export const routes: Routes = [
       { 
         path: 'mascotas', 
         component: MascotaListComponent
+      },
+      { 
+        path: 'mapa', 
+        component: MapaComponent
       },
       { 
         path: 'mascotas/nueva',  // 👈 Esta es la que falta

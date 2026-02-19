@@ -13,7 +13,7 @@ public class AvistamientoDto {
     @NotNull(message = "La mascota es obligatoria")
     private Long mascotaId;
     private String mascotaNombre;
-    @NotNull(message = "El reportador es obligatorio")
+    // reportadorId se envía como @RequestParam en POST crear, no en el body
     private Long reportadorId;
     private String reportadorNombre;
     private UbicacionDto ubicacion;

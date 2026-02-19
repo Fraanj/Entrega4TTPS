@@ -1,24 +1,24 @@
 <div class="flex min-h-screen font-sans text-white bg-premium-dark">
 
-  <!-- BOTÓN HAMBURGUESA (siempre visible) -->
+  <!-- BOTÓN HAMBURGUESA (siempre visible, z-index alto para estar sobre mapas Leaflet) -->
   <button 
     (click)="toggleSidebar()"
-    class="fixed top-4 left-4 z-50 flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors"
+    class="fixed top-4 left-4 z-[1100] flex items-center justify-center w-12 h-12 rounded-xl bg-indigo-600 text-white shadow-lg hover:bg-indigo-700 transition-colors"
     aria-label="Toggle menu">
     <span class="text-2xl">{{ isSidebarOpen ? '✕' : '☰' }}</span>
   </button>
 
-  <!-- OVERLAY (solo cuando está abierto) -->
+  <!-- OVERLAY (solo cuando está abierto, z-index alto para estar sobre mapas Leaflet) -->
   <div 
     *ngIf="isSidebarOpen"
     (click)="closeSidebar()"
-    class="fixed inset-0 z-30 bg-black/50 backdrop-blur-sm">
+    class="fixed inset-0 z-[1000] bg-black/50 backdrop-blur-sm">
   </div>
 
-  <!-- SIDEBAR -->
+  <!-- SIDEBAR (z-index alto para estar sobre mapas Leaflet) -->
   <aside 
     [class.translate-x-0]="isSidebarOpen"
-    class="fixed inset-y-0 left-0 z-40 w-64 flex flex-col border-r border-white/10 bg-premium-dark p-6 backdrop-blur-xl transition-transform duration-300 ease-in-out -translate-x-full">
+    class="fixed inset-y-0 left-0 z-[1050] w-64 flex flex-col border-r border-white/10 bg-premium-dark p-6 backdrop-blur-xl transition-transform duration-300 ease-in-out -translate-x-full">
     
     <div class="mb-10 flex items-center gap-3 px-2 mt-16">
       <div class="text-2xl">🐶</div>

@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, ActivatedRoute, RouterModule } from '@angular/router';
+import { AuthService } from '../../../services/auth.service';
 import { AvistamientoService } from '../../../services/avistamiento.service';
 import { MascotaService } from '../../../services/mascota.service';
 import { NotificationService } from '../../../services/notificacion.services';
@@ -37,6 +38,7 @@ export class AvistamientoFormComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
+    private auth: AuthService,
     private avistamientoService: AvistamientoService,
     private mascotaService: MascotaService,
     private notificationService: NotificationService,
@@ -170,8 +172,16 @@ export class AvistamientoFormComponent implements OnInit {
 
     this.loading = true;
 
+    const user = this.auth.getCurrentUser();
+    if (!user) {
+      this.notificationService.error('Debes estar logueado para reportar un avistamiento');
+      this.loading = false;
+      return;
+    }
+
     const avistamientoData = {
       mascotaId: this.mascotaId,
+      reportadorId: user.id,
       comentario: this.avistamientoForm.value.comentario,
       descripcion: this.avistamientoForm.value.descripcion || '',
       ubicacion: {
@@ -187,7 +197,7 @@ export class AvistamientoFormComponent implements OnInit {
         this.notificationService.success('¡Avistamiento reportado exitosamente!');
         this.loading = false;
         // Redirigir al detalle de la mascota
-        this.router.navigate(['/mascota', this.mascotaId]);
+        this.router.navigate(['/mascotas', this.mascotaId]);
       },
       error: (err) => {
         console.error('Error al crear avistamiento:', err);
@@ -199,7 +209,7 @@ export class AvistamientoFormComponent implements OnInit {
 
   cancelar() {
     if (this.mascotaId) {
-      this.router.navigate(['/mascota', this.mascotaId]);
+      this.router.navigate(['/mascotas', this.mascotaId]);
     } else {
       this.router.navigate(['/mascotas']);
     }
