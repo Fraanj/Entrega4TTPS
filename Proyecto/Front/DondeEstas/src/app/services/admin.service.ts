@@ -22,6 +22,10 @@ export class AdminService {
     return from(this.api.delete<void>(`/admin/usuarios/${id}`, true));
   }
 
+  restaurarUsuario(id: number): Observable<void> {
+    return from(this.api.put<void>(`/admin/usuarios/${id}/restaurar`, {}, true));
+  }
+
   listarMascotas(): Observable<Mascota[]> {
     return from(this.api.get<Mascota[]>('/admin/mascotas', true));
   }

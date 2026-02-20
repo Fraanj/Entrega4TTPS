@@ -15,6 +15,9 @@
     <div *ngIf="error" class="py-10 text-center text-red-400 bg-red-500/10 rounded-xl">{{ error }}</div>
 
     <div *ngIf="!loading && !error" class="rounded-2xl border border-white/10 overflow-hidden">
+      <div class="px-6 py-4 border-b border-white/10 bg-white/5">
+        <h2 class="text-lg font-semibold">Usuarios activos</h2>
+      </div>
       <div class="overflow-x-auto">
         <table class="w-full text-left">
           <thead class="bg-white/5 border-b border-white/10">
@@ -28,7 +31,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr *ngFor="let u of usuarios" class="border-b border-white/5 hover:bg-white/5 transition-colors">
+            <tr *ngFor="let u of usuariosActivos" class="border-b border-white/5 hover:bg-white/5 transition-colors">
               <td class="px-6 py-4 font-mono text-slate-400">{{ u.id }}</td>
               <td class="px-6 py-4 font-medium">{{ u.nombre }} {{ u.apellido }}</td>
               <td class="px-6 py-4 text-slate-300">{{ u.email }}</td>
@@ -55,7 +58,48 @@
           </tbody>
         </table>
       </div>
-      <div *ngIf="usuarios.length === 0" class="py-12 text-center text-slate-500">No hay usuarios registrados.</div>
+      <div *ngIf="usuariosActivos.length === 0" class="py-12 text-center text-slate-500">No hay usuarios activos.</div>
+    </div>
+
+    <div *ngIf="!loading && !error" class="mt-6 rounded-2xl border border-white/10 overflow-hidden">
+      <div class="px-6 py-4 border-b border-white/10 bg-white/5">
+        <h2 class="text-lg font-semibold">Usuarios eliminados</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="w-full text-left">
+          <thead class="bg-white/5 border-b border-white/10">
+            <tr>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">ID</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">Nombre</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">Email</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">Rol</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400">Estado</th>
+              <th class="px-6 py-4 text-xs font-bold uppercase text-slate-400 text-right">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let u of usuariosEliminados" class="border-b border-white/5 hover:bg-white/5 transition-colors">
+              <td class="px-6 py-4 font-mono text-slate-400">{{ u.id }}</td>
+              <td class="px-6 py-4 font-medium">{{ u.nombre }} {{ u.apellido }}</td>
+              <td class="px-6 py-4 text-slate-300">{{ u.email }}</td>
+              <td class="px-6 py-4">
+                <span [class]="u.rolNombre === 'ADMINISTRADOR' ? 'bg-amber-500/20 text-amber-300' : 'bg-slate-500/20 text-slate-300'"
+                      class="px-2 py-1 rounded text-xs font-bold">{{ u.rolNombre }}</span>
+              </td>
+              <td class="px-6 py-4">
+                <span class="text-red-400 font-medium">ELIMINADO</span>
+              </td>
+              <td class="px-6 py-4 text-right">
+                <button (click)="restaurar(u)" [disabled]="accionandoId === u.id"
+                        class="px-3 py-1.5 rounded-lg text-sm font-medium border border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/20 disabled:opacity-50">
+                  Restaurar
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="usuariosEliminados.length === 0" class="py-12 text-center text-slate-500">No hay usuarios eliminados.</div>
     </div>
 
   </div>

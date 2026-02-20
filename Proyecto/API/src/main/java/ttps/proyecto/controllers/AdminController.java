@@ -49,6 +49,12 @@ public class AdminController {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping("/usuarios/{id}/restaurar")
+    public ResponseEntity<?> restaurarUsuario(@PathVariable Long id) {
+        usuarioService.restaurarUsuario(id);
+        return ResponseEntity.ok().build();
+    }
+
     // --- Gestión de Publicaciones (Mascotas) ---
 
     @GetMapping("/mascotas")

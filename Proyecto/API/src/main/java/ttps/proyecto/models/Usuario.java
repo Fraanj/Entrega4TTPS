@@ -26,6 +26,8 @@ public class Usuario {
     private String telefono;
     private String ciudad;
     private Integer puntos = 0;
+    @Column(nullable = false)
+    private Boolean eliminado = false;
 
     // --- Relaciones con Catálogos ---
     @ManyToOne(fetch = FetchType.EAGER)
@@ -87,6 +89,10 @@ public class Usuario {
         return puntos;
     }
 
+    public Boolean getEliminado() {
+        return eliminado;
+    }
+
     public Rol getRol() {
         return rol;
     }
@@ -125,6 +131,10 @@ public class Usuario {
 
     public void setEstado(EstadoUsuario estado) {
         this.estado = estado;
+    }
+
+    public void setEliminado(Boolean eliminado) {
+        this.eliminado = eliminado;
     }
 
     public List<Mascota> getMascotasPublicadas() {

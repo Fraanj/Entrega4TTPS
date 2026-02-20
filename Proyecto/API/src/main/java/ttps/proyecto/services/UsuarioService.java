@@ -80,6 +80,10 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByEmail(request.getEmail())
                 .orElseThrow(() -> new UnauthorizedException("Credenciales inválidas"));
 
+        if (Boolean.TRUE.equals(usuario.getEliminado())) {
+            throw new UnauthorizedException("Usuario eliminado");
+        }
+
         if (!passwordEncoder.matches(request.getPassword(), usuario.getPassword())) {
             throw new UnauthorizedException("Credenciales inválidas");
         }
@@ -141,7 +145,8 @@ public class UsuarioService {
             usuario.getCiudad(),
             usuario.getPuntos(),
             usuario.getRol().getNombre(),
-            usuario.getEstado().getNombre()
+            usuario.getEstado().getNombre(),
+            usuario.getEliminado()
         );
     }
 
@@ -189,9 +194,14 @@ public class UsuarioService {
     public void eliminarUsuario(Long id) {
         Usuario usuario = usuarioRepository.findById(id)
             .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
-        EstadoUsuario estado = estadoRepository.findByNombre("DESHABILITADO")
-            .orElseThrow(() -> new BadRequestException("Estado DESHABILITADO no encontrado"));
-        usuario.setEstado(estado);
+        usuario.setEliminado(true);
+        usuarioRepository.save(usuario);
+    }
+
+    public void restaurarUsuario(Long id) {
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        usuario.setEliminado(false);
         usuarioRepository.save(usuario);
     }
 }

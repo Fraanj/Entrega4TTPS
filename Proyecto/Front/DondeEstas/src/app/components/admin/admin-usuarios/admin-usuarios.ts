@@ -28,6 +28,14 @@ export class AdminUsuariosComponent implements OnInit {
     this.cargarUsuarios();
   }
 
+  get usuariosActivos(): Usuario[] {
+    return this.usuarios.filter((usuario) => !usuario.eliminado);
+  }
+
+  get usuariosEliminados(): Usuario[] {
+    return this.usuarios.filter((usuario) => usuario.eliminado);
+  }
+
   cargarUsuarios() {
     this.loading = true;
     this.error = null;
@@ -77,6 +85,26 @@ export class AdminUsuariosComponent implements OnInit {
       },
       error: (err) => {
         this.notification.error(err?.error?.message || 'Error al eliminar');
+        this.accionandoId = null;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  restaurar(usuario: Usuario) {
+    if (!confirm(`¿Restaurar al usuario ${usuario.nombre} ${usuario.apellido}?`)) {
+      return;
+    }
+    this.accionandoId = usuario.id;
+    this.adminService.restaurarUsuario(usuario.id).subscribe({
+      next: () => {
+        this.notification.success('Usuario restaurado');
+        this.cargarUsuarios();
+        this.accionandoId = null;
+        this.cdr.detectChanges();
+      },
+      error: (err) => {
+        this.notification.error(err?.error?.message || 'Error al restaurar');
         this.accionandoId = null;
         this.cdr.detectChanges();
       }

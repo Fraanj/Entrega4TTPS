@@ -10,14 +10,15 @@ public class UsuarioDto {
     private Integer puntos;
     private String rolNombre;
     private String estadoNombre;
+    private Boolean eliminado;
 
     // Constructor vacío
     public UsuarioDto() {}
 
     // Constructor completo
-    public UsuarioDto(Long id, String nombre, String apellido, String email, 
+    public UsuarioDto(Long id, String nombre, String apellido, String email,
                      String telefono, String ciudad, Integer puntos,
-                     String rolNombre, String estadoNombre) {
+                     String rolNombre, String estadoNombre, Boolean eliminado) {
         this.id = id;
         this.nombre = nombre;
         this.apellido = apellido;
@@ -27,6 +28,7 @@ public class UsuarioDto {
         this.puntos = puntos;
         this.rolNombre = rolNombre;
         this.estadoNombre = estadoNombre;
+        this.eliminado = eliminado;
     }
 
     // Getters y Setters
@@ -56,4 +58,7 @@ public class UsuarioDto {
     
     public String getEstadoNombre() { return estadoNombre; }
     public void setEstadoNombre(String estadoNombre) { this.estadoNombre = estadoNombre; }
+
+    public Boolean getEliminado() { return eliminado; }
+    public void setEliminado(Boolean eliminado) { this.eliminado = eliminado; }
 }

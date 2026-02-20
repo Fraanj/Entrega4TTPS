@@ -8,6 +8,7 @@ export interface Usuario {
   puntos: number;
   rolNombre: string;
   estadoNombre: string;
+  eliminado: boolean;
 }
 
 export interface UsuarioLogged {
