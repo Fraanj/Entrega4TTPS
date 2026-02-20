@@ -187,9 +187,11 @@ public class UsuarioService {
     }
 
     public void eliminarUsuario(Long id) {
-        if (!usuarioRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Usuario no encontrado");
-        }
-        usuarioRepository.deleteById(id);
+        Usuario usuario = usuarioRepository.findById(id)
+            .orElseThrow(() -> new ResourceNotFoundException("Usuario no encontrado"));
+        EstadoUsuario estado = estadoRepository.findByNombre("DESHABILITADO")
+            .orElseThrow(() -> new BadRequestException("Estado DESHABILITADO no encontrado"));
+        usuario.setEstado(estado);
+        usuarioRepository.save(usuario);
     }
 }
