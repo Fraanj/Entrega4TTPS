@@ -70,6 +70,11 @@ public class MascotaService {
             ubicacion.setBarrio(obtenerBarrioDesdeGeoref(lat, lon));
 
             mascota.setUltimaUbicacion(ubicacion);
+        } else if (dto.getUbicacion() != null && dto.getUbicacion().getBarrio() != null && !dto.getUbicacion().getBarrio().isBlank()) {
+            // Barrio ingresado manualmente (e.g. desde Telegram), sin coordenadas
+            Ubicacion ubicacion = new Ubicacion();
+            ubicacion.setBarrio(dto.getUbicacion().getBarrio());
+            mascota.setUltimaUbicacion(ubicacion);
         }
         
         // Manejo de Fotos
